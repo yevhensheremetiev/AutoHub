@@ -1,0 +1,13 @@
+---
+description: Prisma conventions (AutoHub)
+globs: apps/backend/prisma/**/*.{prisma,sql}
+alwaysApply: false
+---
+
+# Prisma conventions
+
+- Keep `DATABASE_URL` in `backend/.env` (see `backend/.env.example`).
+- Keep `DATABASE_URL` in `apps/backend/.env` (see `apps/backend/.env.example`).
+- Migrations are created via `npm run prisma:migrate:dev` inside `apps/backend/`.
+- Add new models incrementally; avoid breaking renames without a migration plan.
+

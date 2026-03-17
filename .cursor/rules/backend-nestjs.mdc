@@ -1,0 +1,14 @@
+---
+description: NestJS backend conventions (AutoHub)
+globs: apps/backend/**/*.ts
+alwaysApply: false
+---
+
+# Backend – NestJS conventions
+
+- Use `@nestjs/config` (`ConfigModule.forRoot({ isGlobal: true })`) for config.
+- Prisma is accessed via `PrismaService` (from `src/prisma/prisma.module.ts`).
+- Firebase Admin is provided via `FIREBASE_ADMIN` token (from `src/firebase/firebase.module.ts`).
+- Prefer modules per domain (`src/<domain>/*`) and keep controllers thin.
+- When adding endpoints, validate input (DTOs) and return explicit response shapes.
+

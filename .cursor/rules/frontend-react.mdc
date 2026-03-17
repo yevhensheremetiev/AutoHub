@@ -1,0 +1,14 @@
+---
+description: React frontend conventions (AutoHub)
+globs: apps/frontend/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend – React conventions
+
+- Use React Router for navigation; keep route components in `src/pages/*`.
+- Data fetching via TanStack Query; keep API calls in `src/api/*` (create when needed).
+- Forms: React Hook Form + Zod; schemas in `src/schemas/*` (create when needed).
+- UI: Tailwind + shadcn/ui; shadcn components live in `src/components/ui/*`.
+- Use `cn()` from `src/lib/utils.ts` for className merging.
+
