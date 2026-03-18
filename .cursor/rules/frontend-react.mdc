@@ -11,4 +11,5 @@ alwaysApply: false
 - Forms: React Hook Form + Zod; schemas in `src/schemas/*` (create when needed).
 - UI: Tailwind + shadcn/ui; shadcn components live in `src/components/ui/*`.
 - Use `cn()` from `src/lib/utils.ts` for className merging.
+- All user-facing text must be added via i18n (e.g. react-i18next) with at least `en` and `uk` translations; do not hardcode strings directly in JSX/TSX.
 

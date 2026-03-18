@@ -3,9 +3,13 @@ import { useNavigate } from 'react-router-dom'
 
 import { firebaseAuth, googleProvider } from '@/lib/firebase'
 import { api } from '@/api/client'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   async function handleLogin() {
     const provider = new GoogleAuthProvider()
@@ -19,17 +23,15 @@ export function LoginPage() {
 
   return (
     <main className="container py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Увійти в AutoHub</h1>
-      <p className="mt-2 text-muted-foreground">
-        Авторизуйся через Google, щоб зберігати дані по своєму авто.
-      </p>
-      <button
-        type="button"
-        onClick={handleLogin}
-        className="mt-6 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-      >
-        Увійти через Google
-      </button>
+      <Text as="h1" variant="h3">
+        {t('auth.loginTitle')}
+      </Text>
+      <Text className="mt-2" variant="muted">
+        {t('auth.loginDescription')}
+      </Text>
+      <Button type="button" onClick={handleLogin} className="mt-6">
+        {t('auth.loginWithGoogle')}
+      </Button>
     </main>
   )
 }

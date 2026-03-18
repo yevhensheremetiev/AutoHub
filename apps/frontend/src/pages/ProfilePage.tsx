@@ -3,15 +3,27 @@ import { useNavigate } from 'react-router-dom'
 
 import { api } from '@/api/client'
 import { useMe } from '@/api/hooks'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
+
+function getErrorStatus(err: unknown): number | undefined {
+  if (!err || typeof err !== 'object') return undefined
+  const response = (err as { response?: unknown }).response
+  if (!response || typeof response !== 'object') return undefined
+  const status = (response as { status?: unknown }).status
+  return typeof status === 'number' ? status : undefined
+}
 
 export function ProfilePage() {
   const navigate = useNavigate()
   const { data: me, isLoading, isError, error } = useMe()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!isError) return
 
-    const status = (error as any)?.response?.status as number | undefined
+    const status = getErrorStatus(error)
     if (status === 401) {
       navigate('/login')
     }
@@ -25,7 +37,7 @@ export function ProfilePage() {
   if (isLoading) {
     return (
       <main className="container py-10">
-        <p>Завантаження...</p>
+        <Text variant="muted">{t('profile.loading')}</Text>
       </main>
     )
   }
@@ -38,18 +50,21 @@ export function ProfilePage() {
     <main className="container py-10 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Профіль</h1>
-          <p className="mt-1 text-muted-foreground">
-            {me.name ?? 'Без імені'} · {me.email ?? 'Без email'}
-          </p>
+          <Text as="h1" variant="h3">
+            {t('profile.title')}
+          </Text>
+          <Text className="mt-1" variant="muted">
+            {me.name ?? t('profile.noName')} · {me.email ?? t('profile.noEmail')}
+          </Text>
         </div>
-        <button
+        <Button
           type="button"
           onClick={handleLogout}
-          className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
+          variant="outline"
+          size="sm"
         >
-          Вийти
-        </button>
+          {t('profile.logout')}
+        </Button>
       </div>
     </main>
   )

@@ -1,19 +1,19 @@
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 
 import { useCars, useCreateCar } from '@/api/hooks'
+import { Button } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
 
 const carSchema = z.object({
-  make: z.string().min(1, 'Марка обовʼязкова'),
-  model: z.string().min(1, 'Модель обовʼязкова'),
+  make: z.string().min(1),
+  model: z.string().min(1),
   year: z
     .string()
     .optional()
-    .refine(
-      (value) => !value || Number.isInteger(Number(value)),
-      'Рік має бути числом',
-    ),
+    .refine((value) => !value || Number.isInteger(Number(value))),
   vin: z.string().optional(),
 })
 
@@ -22,6 +22,7 @@ type CarFormValues = z.infer<typeof carSchema>
 export function CarsPage() {
   const { data: cars, isLoading } = useCars()
   const createCar = useCreateCar()
+  const { t } = useTranslation()
 
   const form = useForm<CarFormValues>({
     resolver: zodResolver(carSchema),
@@ -46,9 +47,13 @@ export function CarsPage() {
   return (
     <main className="container py-10 space-y-6">
       <section>
-        <h1 className="text-3xl font-semibold tracking-tight">Мої авто</h1>
+        <Text as="h1" variant="h3">
+          {t('cars.title')}
+        </Text>
         {isLoading ? (
-          <p className="mt-2 text-muted-foreground">Завантаження списку авто...</p>
+          <Text className="mt-2" variant="muted">
+            {t('cars.loadingList')}
+          </Text>
         ) : (
           <ul className="mt-4 space-y-2">
             {cars?.map((car) => (
@@ -56,69 +61,83 @@ export function CarsPage() {
                 key={car.id}
                 className="flex items-center justify-between rounded-md border border-border px-3 py-2"
               >
-                <span>
+                <Text as="span">
                   {car.make} {car.model}{' '}
-                  {car.year ? <span className="text-muted-foreground">({car.year})</span> : null}
-                </span>
+                  {car.year ? (
+                    <Text as="span" className="text-muted-foreground">
+                      ({car.year})
+                    </Text>
+                  ) : null}
+                </Text>
                 {car.vin ? (
-                  <span className="text-xs text-muted-foreground">VIN: {car.vin}</span>
+                  <Text as="span" variant="muted" className="text-xs">
+                    VIN: {car.vin}
+                  </Text>
                 ) : null}
               </li>
             ))}
             {!cars?.length && (
-              <li className="text-sm text-muted-foreground">Поки що немає жодного авто.</li>
+              <li>
+                <Text variant="muted">{t('cars.emptyList')}</Text>
+              </li>
             )}
           </ul>
         )}
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold tracking-tight">Додати авто</h2>
+        <Text as="h2" variant="h4">
+          {t('cars.addCarTitle')}
+        </Text>
         <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-md">
           <div className="space-y-1">
-            <label className="block text-sm font-medium">Марка</label>
+            <label className="block text-sm font-medium">{t('cars.brandLabel')}</label>
             <input
               type="text"
               {...form.register('make')}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
             {form.formState.errors.make ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.make.message}
-              </p>
+              <Text className="text-xs text-destructive">
+                {t('cars.validation.brandRequired')}
+              </Text>
             ) : null}
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium">Модель</label>
+            <label className="block text-sm font-medium">{t('cars.modelLabel')}</label>
             <input
               type="text"
               {...form.register('model')}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
             {form.formState.errors.model ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.model.message}
-              </p>
+              <Text className="text-xs text-destructive">
+                {t('cars.validation.modelRequired')}
+              </Text>
             ) : null}
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium">Рік (необовʼязково)</label>
+            <label className="block text-sm font-medium">
+              {t('cars.yearLabelOptional')}
+            </label>
             <input
               type="number"
               {...form.register('year')}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
             {form.formState.errors.year ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.year.message as string}
-              </p>
+              <Text className="text-xs text-destructive">
+                {t('cars.validation.yearMustBeNumber')}
+              </Text>
             ) : null}
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium">VIN (необовʼязково)</label>
+            <label className="block text-sm font-medium">
+              {t('cars.vinLabelOptional')}
+            </label>
             <input
               type="text"
               {...form.register('vin')}
@@ -126,13 +145,9 @@ export function CarsPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={createCar.isPending}
-            className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
-          >
-            {createCar.isPending ? 'Збереження...' : 'Додати авто'}
-          </button>
+          <Button type="submit" disabled={createCar.isPending}>
+            {createCar.isPending ? t('cars.saving') : t('cars.addCarButton')}
+          </Button>
         </form>
       </section>
     </main>
