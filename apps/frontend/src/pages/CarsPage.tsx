@@ -1,11 +1,11 @@
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useTranslation } from 'react-i18next'
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 
-import { useCars, useCreateCar } from '@/api/hooks'
-import { Button } from '@/components/ui/button'
-import { Text } from '@/components/ui/text'
+import { useCars, useCreateCar } from '@/api/hooks';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 const carSchema = z.object({
   make: z.string().min(1),
@@ -15,14 +15,14 @@ const carSchema = z.object({
     .optional()
     .refine((value) => !value || Number.isInteger(Number(value))),
   vin: z.string().optional(),
-})
+});
 
-type CarFormValues = z.infer<typeof carSchema>
+type CarFormValues = z.infer<typeof carSchema>;
 
 export function CarsPage() {
-  const { data: cars, isLoading } = useCars()
-  const createCar = useCreateCar()
-  const { t } = useTranslation()
+  const { data: cars, isLoading } = useCars();
+  const createCar = useCreateCar();
+  const { t } = useTranslation();
 
   const form = useForm<CarFormValues>({
     resolver: zodResolver(carSchema),
@@ -32,7 +32,7 @@ export function CarsPage() {
       year: undefined,
       vin: '',
     },
-  })
+  });
 
   const onSubmit = form.handleSubmit((values) => {
     void createCar.mutateAsync({
@@ -40,9 +40,9 @@ export function CarsPage() {
       model: values.model,
       year: values.year ? Number(values.year) : undefined,
       vin: values.vin || undefined,
-    })
-    form.reset()
-  })
+    });
+    form.reset();
+  });
 
   return (
     <main className="container py-10 space-y-6">
@@ -91,7 +91,9 @@ export function CarsPage() {
         </Text>
         <form onSubmit={onSubmit} className="mt-4 space-y-4 max-w-md">
           <div className="space-y-1">
-            <label className="block text-sm font-medium">{t('cars.brandLabel')}</label>
+            <label className="block text-sm font-medium">
+              {t('cars.brandLabel')}
+            </label>
             <input
               type="text"
               {...form.register('make')}
@@ -105,7 +107,9 @@ export function CarsPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium">{t('cars.modelLabel')}</label>
+            <label className="block text-sm font-medium">
+              {t('cars.modelLabel')}
+            </label>
             <input
               type="text"
               {...form.register('model')}
@@ -151,6 +155,5 @@ export function CarsPage() {
         </form>
       </section>
     </main>
-  )
+  );
 }
-

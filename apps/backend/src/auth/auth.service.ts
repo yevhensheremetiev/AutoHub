@@ -19,7 +19,9 @@ export class AuthService {
   ) {}
 
   async authenticateWithGoogle(dto: GoogleAuthDto) {
-    const auth = (await import('firebase-admin/auth')).getAuth(this.firebaseApp);
+    const auth = (await import('firebase-admin/auth')).getAuth(
+      this.firebaseApp,
+    );
 
     let token;
     try {
@@ -72,4 +74,3 @@ export class AuthService {
     };
   }
 }
-

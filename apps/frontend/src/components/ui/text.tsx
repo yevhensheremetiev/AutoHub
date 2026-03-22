@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
-import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 const textVariants = cva('text-foreground', {
   variants: {
@@ -34,13 +34,13 @@ const textVariants = cva('text-foreground', {
     align: 'left',
     clamp: 'none',
   },
-})
+});
 
 export type TextProps = React.HTMLAttributes<HTMLElement> &
   VariantProps<typeof textVariants> & {
-    asChild?: boolean
-    as?: React.ElementType
-  }
+    asChild?: boolean;
+    as?: React.ElementType;
+  };
 
 export function Text({
   className,
@@ -51,7 +51,11 @@ export function Text({
   as,
   ...props
 }: TextProps) {
-  const Comp: React.ElementType = asChild ? Slot : (as ?? 'p')
-  return <Comp className={cn(textVariants({ variant, align, clamp }), className)} {...props} />
+  const Comp: React.ElementType = asChild ? Slot : (as ?? 'p');
+  return (
+    <Comp
+      className={cn(textVariants({ variant, align, clamp }), className)}
+      {...props}
+    />
+  );
 }
-

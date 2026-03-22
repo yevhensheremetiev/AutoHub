@@ -7,4 +7,3 @@ export class MeResponseDto {
   email!: string | null;
   name!: string | null;
 }
-

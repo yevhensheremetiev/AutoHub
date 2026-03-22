@@ -14,5 +14,3 @@ export type CarDto = {
   year?: number | null;
   vin?: string | null;
 };
-
-

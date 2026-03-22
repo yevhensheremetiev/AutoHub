@@ -4,4 +4,3 @@ export class CreateCarDto {
   year?: number;
   vin?: string;
 }
-

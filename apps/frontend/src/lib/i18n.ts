@@ -1,6 +1,6 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 const resources = {
   en: {
@@ -18,9 +18,11 @@ const resources = {
         alreadyHaveAccount: 'Already have an account? Log in',
         noCreditCard: 'No credit card required – sign in with Google.',
         metricInventory: 'Inventory management',
-        metricInventoryDesc: 'All cars, statuses and prices in a single system.',
+        metricInventoryDesc:
+          'All cars, statuses and prices in a single system.',
         metricLeads: 'Lead management',
-        metricLeadsDesc: 'Don’t lose requests – keep your sales funnel under control.',
+        metricLeadsDesc:
+          'Don’t lose requests – keep your sales funnel under control.',
         metricTime: 'Team time saved',
         metricTimeDesc: 'Less routine – more time for real sales.',
         previewLabel: 'Dealership dashboard demo',
@@ -31,13 +33,13 @@ const resources = {
         statusReserved: 'Reserved',
         statusTestDrive: 'Test drive',
         ctaDashboard: 'Go to live dashboard',
-        footerNote: 'After signing in you will land in a dashboard with your inventory and leads.',
+        footerNote:
+          'After signing in you will land in a dashboard with your inventory and leads.',
         rightsReserved: 'All rights reserved.',
       },
       auth: {
         loginTitle: 'Sign in to AutoHub',
-        loginDescription:
-          'Sign in with Google to save data about your car.',
+        loginDescription: 'Sign in with Google to save data about your car.',
         loginWithGoogle: 'Sign in with Google',
         signUp: 'Sign up',
       },
@@ -67,7 +69,12 @@ const resources = {
       },
       notFound: {
         title: 'Page not found',
+        ohNo: 'Oh no! Really?',
+        description:
+          'The link may be outdated, or the page may have been moved. Check the address or return to where everything works.',
+        goBack: 'Go back',
         backToHome: 'Back to home',
+        illustrationAriaLabel: '404 illustration',
       },
       languageSwitcher: {
         label: 'Language',
@@ -93,7 +100,8 @@ const resources = {
         metricInventory: 'Керування автопарком',
         metricInventoryDesc: 'Усі авто, статуси та ціни – в єдиній системі.',
         metricLeads: 'Робота з лідами',
-        metricLeadsDesc: 'Не губіть запити – вся воронка продажів під контролем.',
+        metricLeadsDesc:
+          'Не губіть запити – вся воронка продажів під контролем.',
         metricTime: 'Економія часу менеджерів',
         metricTimeDesc: 'Менше рутини – більше часу на живі продажі.',
         previewLabel: 'Демо-панель автосалону',
@@ -104,7 +112,8 @@ const resources = {
         statusReserved: 'Бронювання',
         statusTestDrive: 'Тест-драйв',
         ctaDashboard: 'Перейти до живого дашборду',
-        footerNote: 'Після входу ви потрапите до дашборду з автопарком та лідами.',
+        footerNote:
+          'Після входу ви потрапите до дашборду з автопарком та лідами.',
         rightsReserved: 'Всі права захищено.',
       },
       auth: {
@@ -128,8 +137,8 @@ const resources = {
         addCarTitle: 'Додати авто',
         brandLabel: 'Марка',
         modelLabel: 'Модель',
-        yearLabelOptional: "Рік (необовʼязково)",
-        vinLabelOptional: "VIN (необовʼязково)",
+        yearLabelOptional: 'Рік (необовʼязково)',
+        vinLabelOptional: 'VIN (необовʼязково)',
         saving: 'Збереження...',
         addCarButton: 'Додати авто',
         validation: {
@@ -140,7 +149,12 @@ const resources = {
       },
       notFound: {
         title: 'Сторінку не знайдено',
-        backToHome: 'Повернутися на головну',
+        ohNo: 'Ой-ой! Справді?',
+        description:
+          'Можливо, посилання застаріло, або сторінку перенесли. Перевірте адресу або поверніться туди, де все працює.',
+        goBack: 'Повернутись назад',
+        backToHome: 'На головну',
+        illustrationAriaLabel: 'Ілюстрація 404',
       },
       languageSwitcher: {
         label: 'Мова',
@@ -149,25 +163,26 @@ const resources = {
       },
     },
   },
-} as const
+} as const;
 
-const languageDetector = new LanguageDetector()
+const languageDetector = new LanguageDetector();
 
 languageDetector.addDetector({
   name: 'customNavigatorOrLocalStorage',
   lookup: () => {
-    if (typeof window === 'undefined') return undefined
+    if (typeof window === 'undefined') return undefined;
 
-    const stored = window.localStorage.getItem('i18nextLng')
-    if (stored) return stored
+    const stored = window.localStorage.getItem('i18nextLng');
+    if (stored) return stored;
 
-    const navLang = window.navigator.languages?.[0] ?? window.navigator.language
-    if (!navLang) return undefined
+    const navLang =
+      window.navigator.languages?.[0] ?? window.navigator.language;
+    if (!navLang) return undefined;
 
-    if (navLang.toLowerCase().startsWith('uk')) return 'uk'
-    return 'en'
+    if (navLang.toLowerCase().startsWith('uk')) return 'uk';
+    return 'en';
   },
-})
+});
 
 void i18n
   .use(initReactI18next)
@@ -177,23 +192,28 @@ void i18n
     fallbackLng: 'en',
     supportedLngs: ['en', 'uk'],
     detection: {
-      order: ['customNavigatorOrLocalStorage', 'querystring', 'cookie', 'localStorage', 'navigator'],
+      order: [
+        'customNavigatorOrLocalStorage',
+        'querystring',
+        'cookie',
+        'localStorage',
+        'navigator',
+      ],
       lookupLocalStorage: 'i18nextLng',
     },
     interpolation: {
       escapeValue: false,
     },
-  })
+  });
 
 i18n.on('languageChanged', (lng) => {
   if (typeof document !== 'undefined') {
-    document.documentElement.lang = lng
+    document.documentElement.lang = lng;
   }
-})
+});
 
 if (typeof document !== 'undefined') {
-  document.documentElement.lang = i18n.language
+  document.documentElement.lang = i18n.language;
 }
 
-export { i18n }
-
+export { i18n };

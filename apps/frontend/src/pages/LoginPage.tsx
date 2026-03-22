@@ -1,24 +1,27 @@
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { useNavigate } from 'react-router-dom'
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
-import { firebaseAuth, googleProvider } from '@/lib/firebase'
-import { api } from '@/api/client'
-import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
-import { Text } from '@/components/ui/text'
+import { firebaseAuth, googleProvider } from '@/lib/firebase';
+import { api } from '@/api/client';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 export function LoginPage() {
-  const navigate = useNavigate()
-  const { t } = useTranslation()
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   async function handleLogin() {
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup(firebaseAuth, googleProvider ?? provider)
-    const idToken = await result.user.getIdToken()
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(
+      firebaseAuth,
+      googleProvider ?? provider,
+    );
+    const idToken = await result.user.getIdToken();
 
-    await api.post('/auth/google', { idToken })
+    await api.post('/auth/google', { idToken });
 
-    navigate('/profile')
+    navigate('/profile');
   }
 
   return (
@@ -33,6 +36,5 @@ export function LoginPage() {
         {t('auth.loginWithGoogle')}
       </Button>
     </main>
-  )
+  );
 }
-

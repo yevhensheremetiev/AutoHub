@@ -1,5 +1,8 @@
-import { applyAccent, applyThemeMode, getInitialAccent } from '@/lib/appearance'
+import {
+  applyAccent,
+  applyThemeMode,
+  getInitialAccent,
+} from '@/lib/appearance';
 
-applyThemeMode('dark')
-applyAccent(getInitialAccent())
-
+applyThemeMode('dark');
+applyAccent(getInitialAccent());

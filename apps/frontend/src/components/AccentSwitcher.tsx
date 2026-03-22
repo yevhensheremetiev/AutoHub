@@ -1,34 +1,38 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   applyAccent,
   getInitialAccent,
   persistAccent,
   type Accent,
-} from '@/lib/appearance'
-import { Text } from '@/components/ui/text'
+} from '@/lib/appearance';
+import { Text } from '@/components/ui/text';
 
-const ACCENTS: Array<{ value: Accent; label: string; swatchClassName: string }> = [
+const ACCENTS: Array<{
+  value: Accent;
+  label: string;
+  swatchClassName: string;
+}> = [
   { value: 'slate', label: 'Slate', swatchClassName: 'bg-slate-700' },
   { value: 'sky', label: 'Sky', swatchClassName: 'bg-sky-500' },
   { value: 'emerald', label: 'Emerald', swatchClassName: 'bg-emerald-500' },
   { value: 'violet', label: 'Violet', swatchClassName: 'bg-violet-500' },
-]
+];
 
 export function AccentSwitcher() {
-  const [accent, setAccent] = useState<Accent>(() => getInitialAccent())
+  const [accent, setAccent] = useState<Accent>(() => getInitialAccent());
 
   useEffect(() => {
-    applyAccent(accent)
-    persistAccent(accent)
-  }, [accent])
+    applyAccent(accent);
+    persistAccent(accent);
+  }, [accent]);
 
-  const handleSetAccent = useCallback((next: Accent) => setAccent(next), [])
+  const handleSetAccent = useCallback((next: Accent) => setAccent(next), []);
 
   return (
     <div className="inline-flex items-center gap-1.5 rounded-full border border-input bg-background p-1 shadow-sm">
       {ACCENTS.map((item) => {
-        const isActive = item.value === accent
+        const isActive = item.value === accent;
         return (
           <button
             key={item.value}
@@ -49,9 +53,8 @@ export function AccentSwitcher() {
               className={`h-3.5 w-3.5 rounded-full ${item.swatchClassName}`}
             />
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
-

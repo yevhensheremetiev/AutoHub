@@ -1,21 +1,21 @@
-import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
-import { AccentSwitcher } from '@/components/AccentSwitcher'
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
-import { Button } from '@/components/ui/button'
-import { Text } from '@/components/ui/text'
+import { AccentSwitcher } from '@/components/AccentSwitcher';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 export function HomePage() {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   function handleLogin() {
-    navigate('/login')
+    navigate('/login');
   }
 
   function handleSignUp() {
-    navigate('/login')
+    navigate('/login');
   }
 
   return (
@@ -27,7 +27,10 @@ export function HomePage() {
         <header className="flex items-center justify-between animate-[fade-down_0.6s_ease-out]">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/40 transition-transform duration-300 hover:-translate-y-0.5 hover:rotate-3">
-              <Text as="span" className="text-lg font-semibold tracking-tight text-primary">
+              <Text
+                as="span"
+                className="text-lg font-semibold tracking-tight text-primary"
+              >
                 A
               </Text>
             </div>
@@ -66,7 +69,11 @@ export function HomePage() {
         <section className="mt-12 grid flex-1 gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center">
           <div className="space-y-8 animate-[fade-in_0.8s_ease-out]">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-slate-900/60 px-3 py-1 text-xs text-slate-100 shadow-sm backdrop-blur">
-              <Text as="span" aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <Text
+                as="span"
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-emerald-400"
+              />
               <Text as="span" className="text-slate-100">
                 {t('home.pill')}
               </Text>
@@ -142,9 +149,21 @@ export function HomePage() {
             <div className="relative rounded-3xl border border-slate-800/80 bg-slate-900/80 p-5 shadow-2xl shadow-slate-950/80 backdrop-blur transition-transform duration-500 hover:-translate-y-1.5 hover:scale-[1.01]">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <Text as="span" aria-hidden="true" className="h-2 w-2 rounded-full bg-rose-500" />
-                  <Text as="span" aria-hidden="true" className="h-2 w-2 rounded-full bg-amber-400" />
-                  <Text as="span" aria-hidden="true" className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <Text
+                    as="span"
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full bg-rose-500"
+                  />
+                  <Text
+                    as="span"
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full bg-amber-400"
+                  />
+                  <Text
+                    as="span"
+                    aria-hidden="true"
+                    className="h-2 w-2 rounded-full bg-emerald-400"
+                  />
                 </div>
                 <Text as="span" className="text-xs text-slate-500">
                   {t('home.previewLabel')}
@@ -157,13 +176,21 @@ export function HomePage() {
                     <Text className="text-xs text-slate-400">
                       {t('home.previewTitle')}
                     </Text>
-                    <Text className="text-lg font-semibold text-slate-50">28 авто</Text>
+                    <Text className="text-lg font-semibold text-slate-50">
+                      28 авто
+                    </Text>
                   </div>
                   <div className="flex gap-2 text-xs">
-                    <Text as="span" className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">
+                    <Text
+                      as="span"
+                      className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300"
+                    >
                       {t('home.previewInStock')}
                     </Text>
-                    <Text as="span" className="rounded-full bg-sky-500/10 px-2 py-1 text-sky-300">
+                    <Text
+                      as="span"
+                      className="rounded-full bg-sky-500/10 px-2 py-1 text-sky-300"
+                    >
                       {t('home.previewReserved')}
                     </Text>
                   </div>
@@ -173,7 +200,9 @@ export function HomePage() {
                   <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2.5 transition-transform duration-300 hover:-translate-y-1 hover:border-emerald-500/60">
                     <div>
                       <Text className="font-medium">Tesla Model 3</Text>
-                      <Text className="mt-0.5 text-[11px] text-slate-400">Long Range · 2022</Text>
+                      <Text className="mt-0.5 text-[11px] text-slate-400">
+                        Long Range · 2022
+                      </Text>
                     </div>
                     <div className="text-right">
                       <Text className="text-sm font-semibold">$41 900</Text>
@@ -186,7 +215,9 @@ export function HomePage() {
                   <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2.5 transition-transform duration-300 hover:-translate-y-1 hover:border-sky-500/60">
                     <div>
                       <Text className="font-medium">BMW X5</Text>
-                      <Text className="mt-0.5 text-[11px] text-slate-400">xDrive 30d · 2021</Text>
+                      <Text className="mt-0.5 text-[11px] text-slate-400">
+                        xDrive 30d · 2021
+                      </Text>
                     </div>
                     <div className="text-right">
                       <Text className="text-sm font-semibold">$58 300</Text>
@@ -199,7 +230,9 @@ export function HomePage() {
                   <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2.5 transition-transform duration-300 hover:-translate-y-1 hover:border-amber-400/70">
                     <div>
                       <Text className="font-medium">Audi Q8 e-tron</Text>
-                      <Text className="mt-0.5 text-[11px] text-slate-400">quattro · 2023</Text>
+                      <Text className="mt-0.5 text-[11px] text-slate-400">
+                        quattro · 2023
+                      </Text>
                     </div>
                     <div className="text-right">
                       <Text className="text-sm font-semibold">$76 200</Text>
@@ -226,9 +259,8 @@ export function HomePage() {
         <footer className="mt-10 border-t border-slate-800/60 pt-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Text as="span" className="text-xs text-slate-500">
-              © {new Date().getFullYear()} {t('common.appName')}. {t('home.rightsReserved', {
-                defaultValue: 'All rights reserved.',
-              })}
+              © {new Date().getFullYear()} {t('common.appName')}.{' '}
+              {t('home.rightsReserved')}
             </Text>
             <Text as="span" className="text-[11px] text-slate-500">
               {t('home.footerNote')}
@@ -237,5 +269,5 @@ export function HomePage() {
         </footer>
       </div>
     </main>
-  )
+  );
 }

@@ -21,4 +21,3 @@ export class CarsController {
     return this.carsService.createForUser(userId, body);
   }
 }
-

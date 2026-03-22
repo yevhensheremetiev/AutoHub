@@ -17,7 +17,9 @@ export const FIREBASE_ADMIN = Symbol('FIREBASE_ADMIN');
         );
 
         if (serviceAccountJson) {
-          const credential = admin.credential.cert(JSON.parse(serviceAccountJson));
+          const credential = admin.credential.cert(
+            JSON.parse(serviceAccountJson),
+          );
           return admin.initializeApp({ credential });
         }
 
@@ -28,4 +30,3 @@ export const FIREBASE_ADMIN = Symbol('FIREBASE_ADMIN');
   exports: [FIREBASE_ADMIN],
 })
 export class FirebaseModule {}
-
