@@ -15,7 +15,7 @@ export function HomePage() {
   }
 
   function handleSignUp() {
-    navigate('/login');
+    navigate('/signup');
   }
 
   return (

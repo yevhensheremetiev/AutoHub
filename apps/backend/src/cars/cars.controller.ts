@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
+import { createCarBodySchema, type CreateCarBody } from '@autohub/shared';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { CarsService } from './cars.service';
-import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('cars')
 @UseGuards(JwtAuthGuard)
@@ -16,7 +17,10 @@ export class CarsController {
   }
 
   @Post()
-  async create(@Req() req: Request, @Body() body: CreateCarDto) {
+  async create(
+    @Req() req: Request,
+    @Body(new ZodValidationPipe(createCarBodySchema)) body: CreateCarBody,
+  ) {
     const userId = (req as any).userId as string;
     return this.carsService.createForUser(userId, body);
   }

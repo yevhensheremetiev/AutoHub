@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import type { CreateCarBody } from '@autohub/shared';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateCarDto } from './dto/create-car.dto';
 
 @Injectable()
 export class CarsService {
@@ -13,7 +13,7 @@ export class CarsService {
     });
   }
 
-  createForUser(userId: string, dto: CreateCarDto) {
+  createForUser(userId: string, dto: CreateCarBody) {
     return (this.prisma as any).car.create({
       data: {
         userId,

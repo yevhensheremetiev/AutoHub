@@ -1,30 +1,32 @@
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 
+import {
+  createCreateCarFormSchema,
+  type CreateCarFormValues,
+} from '@autohub/shared';
 import { useCars, useCreateCar } from '@/api/hooks';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 
-const carSchema = z.object({
-  make: z.string().min(1),
-  model: z.string().min(1),
-  year: z
-    .string()
-    .optional()
-    .refine((value) => !value || Number.isInteger(Number(value))),
-  vin: z.string().optional(),
-});
-
-type CarFormValues = z.infer<typeof carSchema>;
-
 export function CarsPage() {
   const { data: cars, isLoading } = useCars();
   const createCar = useCreateCar();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  const form = useForm<CarFormValues>({
+  const carSchema = useMemo(
+    () =>
+      createCreateCarFormSchema({
+        makeRequired: t('cars.validation.brandRequired'),
+        modelRequired: t('cars.validation.modelRequired'),
+        yearInvalid: t('cars.validation.yearMustBeNumber'),
+      }),
+    [t, i18n.language],
+  );
+
+  const form = useForm<CreateCarFormValues>({
     resolver: zodResolver(carSchema),
     defaultValues: {
       make: '',
@@ -33,6 +35,12 @@ export function CarsPage() {
       vin: '',
     },
   });
+
+  useEffect(() => {
+    if (form.formState.submitCount > 0) {
+      void form.trigger();
+    }
+  }, [form, i18n.language]);
 
   const onSubmit = form.handleSubmit((values) => {
     void createCar.mutateAsync({

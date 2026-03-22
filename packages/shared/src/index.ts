@@ -14,3 +14,5 @@ export type CarDto = {
   year?: number | null;
   vin?: string | null;
 };
+
+export * from './validation/index.js';

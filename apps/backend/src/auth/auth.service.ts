@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { FIREBASE_ADMIN } from '../firebase/firebase.module';
 import type { App } from 'firebase-admin/app';
-import { GoogleAuthDto, MeResponseDto } from './auth.dto';
+import type { GoogleAuthBody } from '@autohub/shared';
+import { MeResponseDto } from './auth.dto';
 import jwt from 'jsonwebtoken';
 
 export interface AuthPayload {
@@ -18,7 +19,7 @@ export class AuthService {
     @Inject(FIREBASE_ADMIN) private readonly firebaseApp: App,
   ) {}
 
-  async authenticateWithGoogle(dto: GoogleAuthDto) {
+  async authenticateWithGoogle(dto: GoogleAuthBody) {
     const auth = (await import('firebase-admin/auth')).getAuth(
       this.firebaseApp,
     );

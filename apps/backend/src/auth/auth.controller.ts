@@ -10,9 +10,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { googleAuthSchema, type GoogleAuthBody } from '@autohub/shared';
 import { AuthService } from './auth.service';
-import { GoogleAuthDto, MeResponseDto } from './auth.dto';
+import { MeResponseDto } from './auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 const SESSION_COOKIE_NAME = 'autohub_session';
 
@@ -23,7 +25,7 @@ export class AuthController {
   @Post('google')
   @HttpCode(HttpStatus.OK)
   async authenticateWithGoogle(
-    @Body() body: GoogleAuthDto,
+    @Body(new ZodValidationPipe(googleAuthSchema)) body: GoogleAuthBody,
     @Res({ passthrough: true }) res: Response,
   ): Promise<MeResponseDto> {
     const { user, token } = await this.authService.authenticateWithGoogle(body);
