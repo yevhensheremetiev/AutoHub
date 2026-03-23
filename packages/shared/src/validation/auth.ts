@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { AuthValidationMessages } from './defaults.js';
+import { defaultAuthValidationMessages } from './defaults.js';
 
 export type StrongPasswordMessages = Pick<
   AuthValidationMessages,
@@ -41,6 +42,21 @@ export function createLoginSchema(
 }
 
 export type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>;
+
+export function createLoginRequestSchema(
+  messages: Pick<
+    AuthValidationMessages,
+    'emailRequired' | 'emailInvalid' | 'passwordRequired' | 'passwordMinLength'
+  >,
+) {
+  return createLoginSchema(messages);
+}
+
+export const loginRequestSchema = createLoginRequestSchema(
+  defaultAuthValidationMessages,
+);
+
+export type LoginRequestBody = z.infer<typeof loginRequestSchema>;
 
 export function createForgotPasswordSchema(
   messages: Pick<AuthValidationMessages, 'emailRequired' | 'emailInvalid'>,
@@ -132,3 +148,38 @@ export function createSignUpSchema(
 }
 
 export type SignUpFormValues = z.infer<ReturnType<typeof createSignUpSchema>>;
+
+export function createSignUpRequestSchema(
+  messages: Pick<
+    AuthValidationMessages,
+    | 'firstNameRequired'
+    | 'lastNameRequired'
+    | 'emailRequired'
+    | 'emailInvalid'
+    | 'passwordRequired'
+    | 'passwordMinLength'
+    | 'passwordLowercase'
+    | 'passwordUppercase'
+    | 'passwordDigit'
+    | 'passwordSpecial'
+  >,
+) {
+  return z.object({
+    firstName: z.string().min(1, { message: messages.firstNameRequired }),
+    lastName: z.string().min(1, { message: messages.lastNameRequired }),
+    email: z
+      .string()
+      .min(1, { message: messages.emailRequired })
+      .email({ message: messages.emailInvalid }),
+    password: z
+      .string()
+      .min(1, { message: messages.passwordRequired })
+      .pipe(createStrongPasswordSchema(messages)),
+  });
+}
+
+export const signUpRequestSchema = createSignUpRequestSchema(
+  defaultAuthValidationMessages,
+);
+
+export type SignUpRequestBody = z.infer<typeof signUpRequestSchema>;

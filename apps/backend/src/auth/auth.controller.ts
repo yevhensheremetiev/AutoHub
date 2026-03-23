@@ -10,7 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { googleAuthSchema, type GoogleAuthBody } from '@autohub/shared';
+import {
+  googleAuthSchema,
+  loginRequestSchema,
+  signUpRequestSchema,
+  type GoogleAuthBody,
+  type LoginRequestBody,
+  type SignUpRequestBody,
+} from '@autohub/shared';
 import { AuthService } from './auth.service';
 import { MeResponseDto } from './auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -21,6 +28,50 @@ const SESSION_COOKIE_NAME = 'autohub_session';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('signup')
+  @HttpCode(HttpStatus.CREATED)
+  async signUp(
+    @Body(new ZodValidationPipe(signUpRequestSchema)) body: SignUpRequestBody,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<MeResponseDto> {
+    const { user, token } = await this.authService.signUpWithEmail(body);
+
+    res.cookie(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body(new ZodValidationPipe(loginRequestSchema)) body: LoginRequestBody,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<MeResponseDto> {
+    const { user, token } = await this.authService.loginWithEmail(body);
+
+    res.cookie(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
+  }
 
   @Post('google')
   @HttpCode(HttpStatus.OK)

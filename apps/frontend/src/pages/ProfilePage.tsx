@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { api } from '@/api/client';
-import { useMe } from '@/api/hooks';
+import { useLogout, useMe } from '@/api';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
@@ -18,6 +17,7 @@ function getErrorStatus(err: unknown): number | undefined {
 export function ProfilePage() {
   const navigate = useNavigate();
   const { data: me, isLoading, isError, error } = useMe();
+  const logoutMutation = useLogout();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function ProfilePage() {
   }, [isError, error, navigate]);
 
   async function handleLogout() {
-    await api.post('/auth/logout');
+    await logoutMutation.mutateAsync();
     navigate('/login');
   }
 
@@ -63,6 +63,7 @@ export function ProfilePage() {
           onClick={handleLogout}
           variant="outline"
           size="sm"
+          disabled={logoutMutation.isPending}
         >
           {t('profile.logout')}
         </Button>

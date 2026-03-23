@@ -7,7 +7,11 @@ alwaysApply: false
 # Frontend – React conventions
 
 - Use React Router for navigation; keep route components in `src/pages/*`.
-- Data fetching via TanStack Query; keep API calls in `src/api/*` (create when needed).
+- Data flow for API is mandatory:
+  - Keep raw Axios endpoints in `src/api/modules/*` (group by domain, e.g. `auth`, `cars`).
+  - Keep TanStack Query hooks in `src/api/queries/*` (`useQuery`/`useMutation` only).
+  - Components/pages must call API via TanStack Query hooks only; do not call Axios directly from components.
+  - Re-export API hooks/modules via `src/api/index.ts` for consistent imports.
 - **Forms (required):** Every form must have validation — no raw submit handlers without schema validation. Use **React Hook Form** with **`zodResolver`**. Define Zod schemas in **`@autohub/shared`** when the same rules apply on the backend (preferred); otherwise colocate a schema next to the page or under `src/` as a small module. Wire user-facing error strings through **i18n** (`en` + `uk`), not hardcoded in the schema on the client (pass `t('…')` into schema factories where the project already does so).
 - UI: Tailwind + shadcn/ui; shadcn components live in `src/components/ui/*`.
 - Use `cn()` from `src/lib/utils.ts` for className merging.

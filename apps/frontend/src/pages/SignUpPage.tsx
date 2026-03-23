@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +13,7 @@ import { Text } from '@/components/ui/text';
 import eyeIcon from '@/assets/icons/eye.svg';
 import eyeHideIcon from '@/assets/icons/eye-hide.svg';
 import googleIcon from '@/assets/icons/google.svg';
-import { api } from '@/api/client';
+import { useGoogleAuth, useSignUp } from '@/api';
 import { firebaseAuth, googleProvider } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 import { createSignUpSchema, type SignUpFormValues } from '@autohub/shared';
@@ -22,6 +23,9 @@ export function SignUpPage() {
   const { t, i18n } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const signUpMutation = useSignUp();
+  const googleSignUpMutation = useGoogleAuth();
 
   const signUpSchema = useMemo(
     () =>
@@ -59,9 +63,33 @@ export function SignUpPage() {
     }
   }, [form, i18n.language]);
 
-  const onSubmit = form.handleSubmit(() => {});
+  const onSubmit = form.handleSubmit((values) => {
+    setSubmitError(null);
+
+    signUpMutation.mutate(
+      {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+      },
+      {
+        onSuccess: () => {
+          navigate('/profile');
+        },
+        onError: (error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 409) {
+            setSubmitError(t('auth.emailAlreadyInUse'));
+            return;
+          }
+          setSubmitError(t('auth.signUpFailed'));
+        },
+      },
+    );
+  });
 
   async function handleGoogleSignUp() {
+    setSubmitError(null);
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(
       firebaseAuth,
@@ -69,7 +97,7 @@ export function SignUpPage() {
     );
     const idToken = await result.user.getIdToken();
 
-    await api.post('/auth/google', { idToken });
+    await googleSignUpMutation.mutateAsync({ idToken });
 
     navigate('/profile');
   }
@@ -309,9 +337,17 @@ export function SignUpPage() {
                 type="submit"
                 size="lg"
                 className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
+                disabled={
+                  form.formState.isSubmitting ||
+                  signUpMutation.isPending ||
+                  googleSignUpMutation.isPending
+                }
               >
                 {t('auth.signUpSubmit')}
               </Button>
+              {submitError ? (
+                <Text className="text-xs text-destructive">{submitError}</Text>
+              ) : null}
             </form>
 
             <div className="relative my-8">
@@ -337,6 +373,7 @@ export function SignUpPage() {
               variant="outline"
               size="lg"
               className="h-11 w-full rounded-full border-slate-600 bg-slate-950/40 text-slate-100 shadow-sm hover:border-slate-500 hover:bg-slate-900/80"
+              disabled={googleSignUpMutation.isPending || signUpMutation.isPending}
               onClick={() => void handleGoogleSignUp()}
             >
               <img

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +13,7 @@ import { Text } from '@/components/ui/text';
 import eyeIcon from '@/assets/icons/eye.svg';
 import eyeHideIcon from '@/assets/icons/eye-hide.svg';
 import googleIcon from '@/assets/icons/google.svg';
-import { api } from '@/api/client';
+import { useGoogleAuth, useLogin } from '@/api';
 import { firebaseAuth, googleProvider } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 import { createLoginSchema, type LoginFormValues } from '@autohub/shared';
@@ -21,6 +22,9 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const loginMutation = useLogin();
+  const googleAuthMutation = useGoogleAuth();
 
   const loginSchema = useMemo(
     () =>
@@ -47,9 +51,24 @@ export function LoginPage() {
     }
   }, [form, i18n.language]);
 
-  const onEmailSubmit = form.handleSubmit(() => {});
+  const onEmailSubmit = form.handleSubmit((values) => {
+    setSubmitError(null);
+    loginMutation.mutate(values, {
+      onSuccess: () => {
+        navigate('/profile');
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          setSubmitError(t('auth.invalidCredentials'));
+          return;
+        }
+        setSubmitError(t('auth.signInFailed'));
+      },
+    });
+  });
 
   async function handleGoogleLogin() {
+    setSubmitError(null);
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(
       firebaseAuth,
@@ -57,7 +76,7 @@ export function LoginPage() {
     );
     const idToken = await result.user.getIdToken();
 
-    await api.post('/auth/google', { idToken });
+    await googleAuthMutation.mutateAsync({ idToken });
 
     navigate('/profile');
   }
@@ -201,9 +220,17 @@ export function LoginPage() {
                 type="submit"
                 size="lg"
                 className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
+                disabled={
+                  form.formState.isSubmitting ||
+                  loginMutation.isPending ||
+                  googleAuthMutation.isPending
+                }
               >
                 {t('auth.signIn')}
               </Button>
+              {submitError ? (
+                <Text className="text-xs text-destructive">{submitError}</Text>
+              ) : null}
             </form>
 
             <div className="relative my-8">
@@ -229,6 +256,7 @@ export function LoginPage() {
               variant="outline"
               size="lg"
               className="h-11 w-full rounded-full border-slate-600 bg-slate-950/40 text-slate-100 shadow-sm hover:border-slate-500 hover:bg-slate-900/80"
+              disabled={googleAuthMutation.isPending || loginMutation.isPending}
               onClick={() => void handleGoogleLogin()}
             >
               <img

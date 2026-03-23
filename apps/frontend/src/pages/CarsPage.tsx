@@ -7,7 +7,7 @@ import {
   createCreateCarFormSchema,
   type CreateCarFormValues,
 } from '@autohub/shared';
-import { useCars, useCreateCar } from '@/api/hooks';
+import { useCars, useCreateCar } from '@/api';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 
