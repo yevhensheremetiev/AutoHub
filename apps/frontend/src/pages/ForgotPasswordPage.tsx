@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { useRequestPasswordReset } from '@/api';
 import { AccentSwitcher } from '@/components/AccentSwitcher';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,9 @@ import {
 
 export function ForgotPasswordPage() {
   const { t, i18n } = useTranslation();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const resetMutation = useRequestPasswordReset();
 
   const schema = useMemo(
     () =>
@@ -37,7 +41,18 @@ export function ForgotPasswordPage() {
     }
   }, [form, i18n.language]);
 
-  const onSubmit = form.handleSubmit(() => {});
+  const onSubmit = form.handleSubmit((values) => {
+    setSubmitError(null);
+    setSubmitted(false);
+    resetMutation.mutate(values, {
+      onSuccess: () => {
+        setSubmitted(true);
+      },
+      onError: () => {
+        setSubmitError(t('auth.forgotPasswordFailed'));
+      },
+    });
+  });
 
   const inputClass =
     'flex h-11 w-full rounded-xl border bg-slate-950/60 px-3.5 text-sm text-slate-50 shadow-inner placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950';
@@ -84,43 +99,58 @@ export function ForgotPasswordPage() {
             <Text className="mt-2 text-slate-400" variant="muted">
               {t('auth.forgotPasswordDescription')}
             </Text>
+            <Text className="mt-3 text-xs text-slate-500" variant="muted">
+              {t('auth.forgotPasswordGoogleOnlyHint')}
+            </Text>
 
-            <form className="mt-8 space-y-5" onSubmit={onSubmit}>
-              <div className="space-y-2">
-                <label
-                  htmlFor="forgot-email"
-                  className="text-sm font-medium leading-none text-slate-200"
+            {submitted ? (
+              <Text className="mt-8 text-sm text-emerald-400/90">
+                {t('auth.forgotPasswordSuccess')}
+              </Text>
+            ) : (
+              <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="forgot-email"
+                    className="text-sm font-medium leading-none text-slate-200"
+                  >
+                    {t('auth.emailLabel')}
+                  </label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.emailPlaceholder')}
+                    className={cn(
+                      inputClass,
+                      form.formState.errors.email
+                        ? 'border-destructive'
+                        : 'border-slate-700',
+                    )}
+                    {...form.register('email')}
+                  />
+                  {form.formState.errors.email ? (
+                    <Text className="text-xs text-destructive">
+                      {form.formState.errors.email.message}
+                    </Text>
+                  ) : null}
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
+                  disabled={
+                    form.formState.isSubmitting || resetMutation.isPending
+                  }
                 >
-                  {t('auth.emailLabel')}
-                </label>
-                <input
-                  id="forgot-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder={t('auth.emailPlaceholder')}
-                  className={cn(
-                    inputClass,
-                    form.formState.errors.email
-                      ? 'border-destructive'
-                      : 'border-slate-700',
-                  )}
-                  {...form.register('email')}
-                />
-                {form.formState.errors.email ? (
-                  <Text className="text-xs text-destructive">
-                    {form.formState.errors.email.message}
-                  </Text>
+                  {t('auth.forgotPasswordSubmit')}
+                </Button>
+                {submitError ? (
+                  <Text className="text-xs text-destructive">{submitError}</Text>
                 ) : null}
-              </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
-              >
-                {t('auth.forgotPasswordSubmit')}
-              </Button>
-            </form>
+              </form>
+            )}
 
             <Text
               as="p"

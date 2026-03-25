@@ -2,12 +2,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
   authenticateWithGoogle,
+  completePasswordReset,
   getMe,
   login,
   logout,
+  requestPasswordReset,
   signUp,
+  type ForgotPasswordInput,
   type GoogleAuthInput,
   type LoginInput,
+  type ResetPasswordInput,
   type SignUpInput,
 } from '@/api/modules/auth';
 
@@ -43,5 +47,18 @@ export function useGoogleAuth() {
 export function useLogout() {
   return useMutation({
     mutationFn: logout,
+  });
+}
+
+export function useRequestPasswordReset() {
+  return useMutation({
+    mutationFn: (payload: ForgotPasswordInput) =>
+      requestPasswordReset(payload),
+  });
+}
+
+export function useCompletePasswordReset() {
+  return useMutation({
+    mutationFn: (payload: ResetPasswordInput) => completePasswordReset(payload),
   });
 }

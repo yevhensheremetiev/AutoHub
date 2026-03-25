@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -14,8 +15,10 @@ import type {
   SignUpRequestBody,
 } from '@autohub/shared';
 import { MeResponseDto } from './auth.dto';
+import { MailService } from './mail.service';
 import jwt from 'jsonwebtoken';
 import {
+  createHash,
   randomBytes,
   randomUUID,
   scrypt as scryptCallback,
@@ -29,11 +32,14 @@ export interface AuthPayload {
   sub: string;
 }
 
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
     @Inject(FIREBASE_ADMIN) private readonly firebaseApp: App,
   ) {}
 
@@ -163,6 +169,78 @@ export class AuthService {
       email: user.email,
       name: user.name,
     };
+  }
+
+  /** Always completes without revealing whether the email exists (email/password accounts only). */
+  async requestPasswordReset(rawEmail: string): Promise<void> {
+    const email = rawEmail.trim().toLowerCase();
+
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user || !user.email) {
+      return;
+    }
+
+    if (!user.passwordHash) {
+      await this.mail.sendGoogleOnlyResetNotice(user.email);
+      return;
+    }
+
+    const rawToken = randomBytes(32).toString('hex');
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+
+    await this.prisma.$transaction([
+      this.prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      }),
+      this.prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+        },
+      }),
+    ]);
+
+    const origin = this.config.get<string>('CLIENT_ORIGIN')?.replace(/\/$/, '');
+    if (!origin) {
+      throw new Error('CLIENT_ORIGIN is not configured');
+    }
+
+    const resetLink = `${origin}/reset-password?token=${encodeURIComponent(rawToken)}`;
+    await this.mail.sendPasswordResetEmail(user.email, resetLink);
+  }
+
+  async resetPasswordWithToken(rawToken: string, newPassword: string): Promise<void> {
+    const trimmed = rawToken.trim();
+    if (!trimmed.length) {
+      throw new BadRequestException('Invalid or expired reset link');
+    }
+
+    const tokenHash = createHash('sha256').update(trimmed).digest('hex');
+
+    const record = await this.prisma.passwordResetToken.findUnique({
+      where: { tokenHash },
+    });
+
+    if (!record || record.expiresAt.getTime() < Date.now()) {
+      throw new BadRequestException('Invalid or expired reset link');
+    }
+
+    const passwordHash = await this.hashPassword(newPassword);
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: record.userId },
+        data: { passwordHash },
+      }),
+      this.prisma.passwordResetToken.delete({
+        where: { id: record.id },
+      }),
+    ]);
   }
 
   private createSessionToken(userId: string): string {

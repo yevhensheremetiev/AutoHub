@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { useCompletePasswordReset } from '@/api';
 import { AccentSwitcher } from '@/components/AccentSwitcher';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -23,6 +25,9 @@ export function ResetPasswordPage() {
   const token = searchParams.get('token')?.trim() ?? '';
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const resetMutation = useCompletePasswordReset();
 
   const schema = useMemo(
     () =>
@@ -53,7 +58,27 @@ export function ResetPasswordPage() {
     }
   }, [form, i18n.language]);
 
-  const onSubmit = form.handleSubmit(() => {});
+  const onSubmit = form.handleSubmit((values) => {
+    setSubmitError(null);
+    resetMutation.mutate(
+      { token, password: values.password },
+      {
+        onSuccess: () => {
+          setResetSuccess(true);
+        },
+        onError: (error) => {
+          if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 400
+          ) {
+            setSubmitError(t('auth.resetPasswordBadToken'));
+            return;
+          }
+          setSubmitError(t('auth.resetPasswordFailed'));
+        },
+      },
+    );
+  });
 
   const inputClass =
     'flex h-11 w-full rounded-xl border bg-slate-950/60 px-3.5 text-sm text-slate-50 shadow-inner placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950';
@@ -123,6 +148,25 @@ export function ResetPasswordPage() {
                       {t('auth.backToLogin')}
                     </Link>
                   </Text>
+                </div>
+              </>
+            ) : resetSuccess ? (
+              <>
+                <Text as="h1" variant="h3" className="text-slate-50">
+                  {t('auth.resetPasswordSuccessTitle')}
+                </Text>
+                <Text className="mt-2 text-slate-400" variant="muted">
+                  {t('auth.resetPasswordSuccessDescription')}
+                </Text>
+                <div className="mt-8">
+                  <Button
+                    type="button"
+                    className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
+                    size="lg"
+                    onClick={() => navigate('/login')}
+                  >
+                    {t('auth.signIn')}
+                  </Button>
                 </div>
               </>
             ) : (
@@ -239,9 +283,17 @@ export function ResetPasswordPage() {
                     type="submit"
                     size="lg"
                     className="h-11 w-full rounded-full shadow-lg shadow-primary/25"
+                    disabled={
+                      form.formState.isSubmitting || resetMutation.isPending
+                    }
                   >
                     {t('auth.resetPasswordSubmit')}
                   </Button>
+                  {submitError ? (
+                    <Text className="text-xs text-destructive">
+                      {submitError}
+                    </Text>
+                  ) : null}
                 </form>
 
                 <Text

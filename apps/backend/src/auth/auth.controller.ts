@@ -11,11 +11,15 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import {
+  forgotPasswordRequestSchema,
   googleAuthSchema,
   loginRequestSchema,
+  resetPasswordRequestSchema,
   signUpRequestSchema,
+  type ForgotPasswordRequestBody,
   type GoogleAuthBody,
   type LoginRequestBody,
+  type ResetPasswordRequestBody,
   type SignUpRequestBody,
 } from '@autohub/shared';
 import { AuthService } from './auth.service';
@@ -103,6 +107,24 @@ export class AuthController {
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
     });
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async forgotPassword(
+    @Body(new ZodValidationPipe(forgotPasswordRequestSchema))
+    body: ForgotPasswordRequestBody,
+  ): Promise<void> {
+    await this.authService.requestPasswordReset(body.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resetPassword(
+    @Body(new ZodValidationPipe(resetPasswordRequestSchema))
+    body: ResetPasswordRequestBody,
+  ): Promise<void> {
+    await this.authService.resetPasswordWithToken(body.token, body.password);
   }
 
   @Get('me')

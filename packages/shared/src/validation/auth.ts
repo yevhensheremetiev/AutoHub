@@ -73,6 +73,12 @@ export type ForgotPasswordFormValues = z.infer<
   ReturnType<typeof createForgotPasswordSchema>
 >;
 
+export const forgotPasswordRequestSchema = createForgotPasswordSchema(
+  defaultAuthValidationMessages,
+);
+
+export type ForgotPasswordRequestBody = z.infer<typeof forgotPasswordRequestSchema>;
+
 export function createResetPasswordSchema(
   messages: Pick<
     AuthValidationMessages,
@@ -183,3 +189,13 @@ export const signUpRequestSchema = createSignUpRequestSchema(
 );
 
 export type SignUpRequestBody = z.infer<typeof signUpRequestSchema>;
+
+export const resetPasswordRequestSchema = z.object({
+  token: z.string().min(1, { message: 'Reset token is required' }),
+  password: z
+    .string()
+    .min(1, { message: defaultAuthValidationMessages.passwordRequired })
+    .pipe(createStrongPasswordSchema(defaultAuthValidationMessages)),
+});
+
+export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestSchema>;

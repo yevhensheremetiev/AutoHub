@@ -72,7 +72,12 @@ const resources = {
         forgotPasswordTitle: 'Reset your password',
         forgotPasswordDescription:
           'Enter the email for your account. We will send you a link to set a new password.',
+        forgotPasswordGoogleOnlyHint:
+          'If you only ever used “Sign in with Google”, there is no password to reset — use Google on the sign-in page, or you will get an email explaining this.',
         forgotPasswordSubmit: 'Send request',
+        forgotPasswordSuccess:
+          'If an account with that email exists, we sent a link to reset your password.',
+        forgotPasswordFailed: 'Could not send reset email. Try again.',
         backToLogin: 'Back to sign in',
         resetPasswordTitle: 'Set a new password',
         resetPasswordDescription:
@@ -86,6 +91,11 @@ const resources = {
         resetPasswordInvalidDescription:
           'This page must be opened from the reset link in your email. The link may be missing, expired, or already used.',
         resetPasswordRequestNewLink: 'Request a new reset email',
+        resetPasswordFailed: 'Could not update password. Try again.',
+        resetPasswordBadToken: 'This reset link is invalid or has expired. Request a new one.',
+        resetPasswordSuccessTitle: 'Password updated',
+        resetPasswordSuccessDescription:
+          'You can now sign in with your new password.',
         validation: {
           firstNameRequired: 'First name is required',
           lastNameRequired: 'Last name is required',
@@ -209,7 +219,12 @@ const resources = {
         forgotPasswordTitle: 'Відновлення пароля',
         forgotPasswordDescription:
           'Вкажіть email акаунта — надішлемо посилання для нового пароля.',
+        forgotPasswordGoogleOnlyHint:
+          'Якщо ви входили лише через Google, окремого пароля немає — увійдіть через Google на сторінці входу, або отримаєте лист із поясненням.',
         forgotPasswordSubmit: 'Надіслати запит',
+        forgotPasswordSuccess:
+          'Якщо акаунт із таким email існує, ми надіслали посилання для відновлення пароля.',
+        forgotPasswordFailed: 'Не вдалося надіслати лист. Спробуйте ще раз.',
         backToLogin: 'Назад до входу',
         resetPasswordTitle: 'Новий пароль',
         resetPasswordDescription:
@@ -223,6 +238,12 @@ const resources = {
         resetPasswordInvalidDescription:
           'Цю сторінку потрібно відкривати з посилання в листі. Посилання може бути простроченим, уже використаним або відсутнім.',
         resetPasswordRequestNewLink: 'Надіслати новий лист',
+        resetPasswordFailed: 'Не вдалося змінити пароль. Спробуйте ще раз.',
+        resetPasswordBadToken:
+          'Посилання недійсне або прострочене. Запросіть новий лист.',
+        resetPasswordSuccessTitle: 'Пароль змінено',
+        resetPasswordSuccessDescription:
+          'Тепер ви можете увійти з новим паролем.',
         validation: {
           firstNameRequired: 'Вкажіть ім’я',
           lastNameRequired: 'Вкажіть прізвище',
