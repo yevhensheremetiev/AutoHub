@@ -9,6 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import {
   forgotPasswordRequestSchema,
@@ -28,11 +29,15 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 
 const SESSION_COOKIE_NAME = 'autohub_session';
+const AUTH_THROTTLE_TTL_MS = 60_000;
+const AUTH_CREDENTIAL_LIMIT = 60;
+const AUTH_FORGOT_PASSWORD_LIMIT = 20;
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async signUp(
@@ -55,6 +60,7 @@ export class AuthController {
     };
   }
 
+  @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -77,6 +83,7 @@ export class AuthController {
     };
   }
 
+  @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
   @Post('google')
   @HttpCode(HttpStatus.OK)
   async authenticateWithGoogle(
@@ -99,6 +106,7 @@ export class AuthController {
     };
   }
 
+  @SkipThrottle()
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Res({ passthrough: true }) res: Response): Promise<void> {
@@ -109,6 +117,7 @@ export class AuthController {
     });
   }
 
+  @Throttle({ default: { limit: AUTH_FORGOT_PASSWORD_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
   @Post('forgot-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async forgotPassword(
@@ -118,6 +127,7 @@ export class AuthController {
     await this.authService.requestPasswordReset(body.email);
   }
 
+  @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
   @Post('reset-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async resetPassword(
@@ -127,6 +137,7 @@ export class AuthController {
     await this.authService.resetPasswordWithToken(body.token, body.password);
   }
 
+  @SkipThrottle()
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async me(@Req() req: Request): Promise<MeResponseDto> {

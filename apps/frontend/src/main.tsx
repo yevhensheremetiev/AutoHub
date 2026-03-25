@@ -9,7 +9,13 @@ import App from './App.tsx';
 import './lib/i18n';
 import './lib/appearance-init';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
