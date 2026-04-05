@@ -1,7 +1,9 @@
 import type {
+  ChangePasswordRequestBody,
   ForgotPasswordRequestBody,
   LoginRequestBody,
   ResetPasswordRequestBody,
+  UpdateProfileRequestBody,
   UserDto,
 } from '@autohub/shared';
 
@@ -44,6 +46,19 @@ export async function authenticateWithGoogle(
 export async function getMe(): Promise<UserDto> {
   const res = await api.get<UserDto>('/auth/me');
   return res.data;
+}
+
+export async function updateProfile(
+  payload: UpdateProfileRequestBody,
+): Promise<UserDto> {
+  const res = await api.patch<UserDto>('/auth/me', payload);
+  return res.data;
+}
+
+export async function changePassword(
+  payload: ChangePasswordRequestBody,
+): Promise<void> {
+  await api.post('/auth/change-password', payload);
 }
 
 export async function logout(): Promise<void> {

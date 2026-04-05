@@ -1,5 +1,5 @@
 export type ThemeMode = 'light' | 'dark';
-export type Accent = 'slate' | 'sky' | 'emerald' | 'violet';
+export type Accent = 'sky' | 'emerald' | 'violet';
 
 const STORAGE_KEYS = {
   theme: 'theme',
@@ -33,20 +33,18 @@ export function persistThemeMode(mode: ThemeMode) {
 }
 
 export function getInitialAccent(): Accent {
-  if (typeof window === 'undefined') return 'slate';
+  if (typeof window === 'undefined') return 'sky';
 
-  const stored = window.localStorage.getItem(
-    STORAGE_KEYS.accent,
-  ) as Accent | null;
-  if (
-    stored === 'slate' ||
-    stored === 'sky' ||
-    stored === 'emerald' ||
-    stored === 'violet'
-  ) {
+  const raw = window.localStorage.getItem(STORAGE_KEYS.accent);
+  if (raw === 'slate') {
+    window.localStorage.setItem(STORAGE_KEYS.accent, 'sky');
+    return 'sky';
+  }
+  const stored = raw as Accent | null;
+  if (stored === 'sky' || stored === 'emerald' || stored === 'violet') {
     return stored;
   }
-  return 'slate';
+  return 'sky';
 }
 
 export function applyAccent(accent: Accent) {

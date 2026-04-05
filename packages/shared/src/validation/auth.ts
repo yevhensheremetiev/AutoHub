@@ -199,3 +199,81 @@ export const resetPasswordRequestSchema = z.object({
 });
 
 export type ResetPasswordRequestBody = z.infer<typeof resetPasswordRequestSchema>;
+
+export const updateProfileRequestSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: defaultAuthValidationMessages.displayNameRequired })
+    .max(120, { message: defaultAuthValidationMessages.displayNameTooLong }),
+});
+
+export type UpdateProfileRequestBody = z.infer<typeof updateProfileRequestSchema>;
+
+export function createUpdateProfileSchema(
+  messages: Pick<
+    AuthValidationMessages,
+    'displayNameRequired' | 'displayNameTooLong'
+  >,
+) {
+  return z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: messages.displayNameRequired })
+      .max(120, { message: messages.displayNameTooLong }),
+  });
+}
+
+export type UpdateProfileFormValues = z.infer<
+  ReturnType<typeof createUpdateProfileSchema>
+>;
+
+export const changePasswordRequestSchema = z.object({
+  currentPassword: z
+    .string()
+    .min(1, { message: defaultAuthValidationMessages.currentPasswordRequired }),
+  newPassword: z
+    .string()
+    .min(1, { message: defaultAuthValidationMessages.passwordRequired })
+    .pipe(createStrongPasswordSchema(defaultAuthValidationMessages)),
+});
+
+export type ChangePasswordRequestBody = z.infer<typeof changePasswordRequestSchema>;
+
+export function createChangePasswordFormSchema(
+  messages: Pick<
+    AuthValidationMessages,
+    | 'currentPasswordRequired'
+    | 'passwordRequired'
+    | 'passwordMinLength'
+    | 'passwordLowercase'
+    | 'passwordUppercase'
+    | 'passwordDigit'
+    | 'passwordSpecial'
+    | 'confirmPasswordRequired'
+    | 'passwordsMustMatch'
+  >,
+) {
+  return z
+    .object({
+      currentPassword: z
+        .string()
+        .min(1, { message: messages.currentPasswordRequired }),
+      newPassword: z
+        .string()
+        .min(1, { message: messages.passwordRequired })
+        .pipe(createStrongPasswordSchema(messages)),
+      confirmNewPassword: z
+        .string()
+        .min(1, { message: messages.confirmPasswordRequired }),
+    })
+    .refine((data) => data.newPassword === data.confirmNewPassword, {
+      message: messages.passwordsMustMatch,
+      path: ['confirmNewPassword'],
+    });
+}
+
+export type ChangePasswordFormValues = z.infer<
+  ReturnType<typeof createChangePasswordFormSchema>
+>;

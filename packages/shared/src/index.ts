@@ -4,6 +4,8 @@ export type UserDto = {
   id: string;
   email: string | null;
   name: string | null;
+  /** True when the account has an email/password hash (not Google-only). */
+  passwordSignInEnabled: boolean;
 };
 
 export type CarDto = {

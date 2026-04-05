@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   Res,
@@ -12,16 +13,20 @@ import {
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import {
+  changePasswordRequestSchema,
   forgotPasswordRequestSchema,
   googleAuthSchema,
   loginRequestSchema,
   resetPasswordRequestSchema,
   signUpRequestSchema,
+  updateProfileRequestSchema,
+  type ChangePasswordRequestBody,
   type ForgotPasswordRequestBody,
   type GoogleAuthBody,
   type LoginRequestBody,
   type ResetPasswordRequestBody,
   type SignUpRequestBody,
+  type UpdateProfileRequestBody,
 } from '@autohub/shared';
 import { AuthService } from './auth.service';
 import { MeResponseDto } from './auth.dto';
@@ -53,11 +58,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    };
+    return this.authService.toMeResponse(user);
   }
 
   @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
@@ -76,11 +77,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    };
+    return this.authService.toMeResponse(user);
   }
 
   @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
@@ -99,11 +96,7 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    };
+    return this.authService.toMeResponse(user);
   }
 
   @SkipThrottle()
@@ -143,5 +136,35 @@ export class AuthController {
   async me(@Req() req: Request): Promise<MeResponseDto> {
     const userId = (req as any).userId as string;
     return this.authService.getMe(userId);
+  }
+
+  @SkipThrottle()
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async updateMe(
+    @Req() req: Request,
+    @Body(new ZodValidationPipe(updateProfileRequestSchema))
+    body: UpdateProfileRequestBody,
+  ): Promise<MeResponseDto> {
+    const userId = (req as any).userId as string;
+    return this.authService.updateProfile(userId, body);
+  }
+
+  @Throttle({ default: { limit: AUTH_CREDENTIAL_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(
+    @Req() req: Request,
+    @Body(new ZodValidationPipe(changePasswordRequestSchema))
+    body: ChangePasswordRequestBody,
+  ): Promise<void> {
+    const userId = (req as any).userId as string;
+    await this.authService.changePassword(
+      userId,
+      body.currentPassword,
+      body.newPassword,
+    );
   }
 }

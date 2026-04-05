@@ -12,6 +12,9 @@ export const defaultAuthValidationMessages = {
   passwordSpecial: 'Add at least one special character (!@#$…)',
   confirmPasswordRequired: 'Confirm your password',
   passwordsMustMatch: 'Passwords do not match',
+  currentPasswordRequired: 'Current password is required',
+  displayNameRequired: 'Name is required',
+  displayNameTooLong: 'Name is too long (max 120 characters)',
 } as const;
 
 export type AuthValidationMessages = {

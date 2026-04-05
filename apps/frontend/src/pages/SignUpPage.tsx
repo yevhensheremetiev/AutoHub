@@ -75,7 +75,7 @@ export function SignUpPage() {
       },
       {
         onSuccess: () => {
-          navigate('/profile');
+          navigate('/dashboard');
         },
         onError: (error) => {
           if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -99,7 +99,7 @@ export function SignUpPage() {
 
     await googleSignUpMutation.mutateAsync({ idToken });
 
-    navigate('/profile');
+    navigate('/dashboard');
   }
 
   const inputClass =

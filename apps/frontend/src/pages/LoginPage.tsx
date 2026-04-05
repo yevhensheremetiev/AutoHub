@@ -55,7 +55,7 @@ export function LoginPage() {
     setSubmitError(null);
     loginMutation.mutate(values, {
       onSuccess: () => {
-        navigate('/profile');
+        navigate('/dashboard');
       },
       onError: (error) => {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -78,7 +78,7 @@ export function LoginPage() {
 
     await googleAuthMutation.mutateAsync({ idToken });
 
-    navigate('/profile');
+    navigate('/dashboard');
   }
 
   const inputClass =

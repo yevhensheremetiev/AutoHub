@@ -13,7 +13,6 @@ const ACCENTS: Array<{
   label: string;
   swatchClassName: string;
 }> = [
-  { value: 'slate', label: 'Slate', swatchClassName: 'bg-slate-700' },
   { value: 'sky', label: 'Sky', swatchClassName: 'bg-sky-500' },
   { value: 'emerald', label: 'Emerald', swatchClassName: 'bg-emerald-500' },
   { value: 'violet', label: 'Violet', swatchClassName: 'bg-violet-500' },

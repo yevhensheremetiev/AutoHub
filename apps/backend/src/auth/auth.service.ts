@@ -13,6 +13,7 @@ import type {
   GoogleAuthBody,
   LoginRequestBody,
   SignUpRequestBody,
+  UpdateProfileRequestBody,
 } from '@autohub/shared';
 import { MeResponseDto } from './auth.dto';
 import { MailService } from './mail.service';
@@ -155,6 +156,20 @@ export class AuthService {
     return { user, token: this.createSessionToken(user.id) };
   }
 
+  toMeResponse(user: {
+    id: string;
+    email: string | null;
+    name: string | null;
+    passwordHash: string | null;
+  }): MeResponseDto {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      passwordSignInEnabled: Boolean(user.passwordHash),
+    };
+  }
+
   async getMe(userId: string): Promise<MeResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -164,11 +179,51 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    };
+    return this.toMeResponse(user);
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileRequestBody,
+  ): Promise<MeResponseDto> {
+    const name = dto.name.trim();
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { name },
+    });
+    return this.toMeResponse(user);
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (!user.passwordHash) {
+      throw new BadRequestException('PASSWORD_SIGN_IN_NOT_SET');
+    }
+
+    const isCurrentValid = await this.verifyPassword(
+      currentPassword,
+      user.passwordHash,
+    );
+    if (!isCurrentValid) {
+      throw new BadRequestException('INVALID_CURRENT_PASSWORD');
+    }
+
+    const passwordHash = await this.hashPassword(newPassword);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
   }
 
   /** Always completes without revealing whether the email exists (email/password accounts only). */
