@@ -6,6 +6,7 @@ export type CreateCarInput = {
   make: string;
   model: string;
   year?: number;
+  licensePlate: string;
   vin?: string;
 };
 

@@ -53,7 +53,10 @@ export function HomePage() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50">
+    <main className="relative flex min-h-screen flex-col bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-zinc-50">
+      <div className="pointer-events-none fixed inset-0 -z-10 opacity-50">
+        <div className="animate-[pulse_12s_ease-in-out_infinite] bg-[radial-gradient(circle_at_20%_20%,_rgba(56,189,248,0.12),_transparent_50%),_radial-gradient(circle_at_80%_60%,_rgba(147,51,234,0.12),_transparent_50%)] blur-3xl" />
+      </div>
       <div className="container flex max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6">
         <header className="flex items-center justify-between animate-[fade-down_0.6s_ease-out]">
           <div className="flex items-center gap-2">

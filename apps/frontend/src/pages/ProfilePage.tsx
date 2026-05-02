@@ -227,9 +227,6 @@ export function ProfilePage() {
             <Text as="p" className="text-lg font-semibold text-slate-50">
               {displayName}
             </Text>
-            <Text className="text-sm text-slate-400">
-              {me.email ?? t('profile.noEmail')}
-            </Text>
           </div>
         </div>
       </div>
@@ -302,9 +299,6 @@ export function ProfilePage() {
                 )}
               />
             </div>
-            <Text className="text-xs text-slate-500">
-              {t('profile.emailReadOnlyHint')}
-            </Text>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

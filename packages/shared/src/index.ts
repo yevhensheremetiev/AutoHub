@@ -14,6 +14,8 @@ export type CarDto = {
   make: string;
   model: string;
   year?: number | null;
+  /** Registration / license plate number. */
+  licensePlate?: string | null;
   vin?: string | null;
 };
 

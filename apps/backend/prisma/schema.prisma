@@ -35,16 +35,19 @@ model PasswordResetToken {
 }
 
 model Car {
-  id        String   @id @default(cuid())
-  userId    String
-  make      String
-  model     String
-  year      Int?
-  vin       String?  @unique
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  userId        String
+  make          String
+  model         String
+  year          Int?
+  /** Vehicle registration / license plate (shown in driver UI). */
+  licensePlate  String?
+  vin           String?  @unique
+  createdAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, licensePlate])
   @@index([userId])
   @@map("cars")
 }

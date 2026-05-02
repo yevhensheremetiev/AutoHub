@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ArrowLeft } from 'lucide-react';
 
+import { useCars } from '@/api/queries/cars';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import {
   getOffering,
   getStationById,
-  MOCK_DRIVER_CARS,
   MOCK_TIME_SLOTS,
 } from '@/mocks/driver-dashboard';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,7 @@ export function BookServicePage() {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
+  const { data: cars = [] } = useCars();
 
   const station = stationId ? getStationById(stationId) : undefined;
   const offerFromQuery = searchParams.get('offer') ?? '';
@@ -43,12 +44,20 @@ export function BookServicePage() {
     resolver: zodResolver(bookSchema),
     defaultValues: {
       offeringId: '',
-      carId: MOCK_DRIVER_CARS[0]?.id ?? '',
+      carId: '',
       date: '',
       time: '',
       notes: '',
     },
   });
+
+  useEffect(() => {
+    if (cars.length === 0) return;
+    const current = form.getValues('carId');
+    if (!current || !cars.some((c) => c.id === current)) {
+      form.setValue('carId', cars[0]!.id);
+    }
+  }, [cars, form]);
 
   useEffect(() => {
     if (!stationId) return;
@@ -60,12 +69,12 @@ export function BookServicePage() {
         : (st.offerings[0]?.id ?? '');
     form.reset({
       offeringId: oid,
-      carId: MOCK_DRIVER_CARS[0]?.id ?? '',
+      carId: cars[0]?.id ?? '',
       date: '',
       time: '',
       notes: '',
     });
-  }, [stationId, offerFromQuery, form]);
+  }, [stationId, offerFromQuery, form, cars]);
 
   const offeringId = useWatch({
     control: form.control,
@@ -186,25 +195,41 @@ export function BookServicePage() {
           <label htmlFor="book-car" className="text-sm text-slate-200">
             {t('driver.book.fieldCar')}
           </label>
-          <select
-            id="book-car"
-            className={cn(
-              inputClass,
-              form.formState.errors.carId ? 'border-destructive' : '',
-            )}
-            {...form.register('carId')}
-          >
-            {MOCK_DRIVER_CARS.map((car) => (
-              <option key={car.id} value={car.id}>
-                {car.make} {car.model} ({car.year}) · {car.plate}
-              </option>
-            ))}
-          </select>
-          {form.formState.errors.carId ? (
-            <Text className="text-xs text-destructive">
-              {form.formState.errors.carId.message}
+          {cars.length === 0 ? (
+            <Text className="text-sm text-amber-200/90">
+              {t('driver.book.noCarsHint')}{' '}
+              <Link
+                to="/dashboard/cars/new"
+                className="font-medium text-primary underline underline-offset-2 hover:text-primary/90"
+              >
+                {t('driver.addCarCta')}
+              </Link>
             </Text>
-          ) : null}
+          ) : (
+            <>
+              <select
+                id="book-car"
+                className={cn(
+                  inputClass,
+                  form.formState.errors.carId ? 'border-destructive' : '',
+                )}
+                {...form.register('carId')}
+              >
+                {cars.map((car) => (
+                  <option key={car.id} value={car.id}>
+                    {car.make} {car.model}
+                    {car.year != null ? ` (${car.year})` : ''} ·{' '}
+                    {car.licensePlate ?? '—'}
+                  </option>
+                ))}
+              </select>
+              {form.formState.errors.carId ? (
+                <Text className="text-xs text-destructive">
+                  {form.formState.errors.carId.message}
+                </Text>
+              ) : null}
+            </>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -270,6 +295,7 @@ export function BookServicePage() {
         <Button
           type="submit"
           size="lg"
+          disabled={cars.length === 0}
           className="h-11 w-full rounded-xl shadow-lg shadow-primary/20"
         >
           {t('driver.book.submit')}

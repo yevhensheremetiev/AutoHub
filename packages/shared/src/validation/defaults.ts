@@ -25,6 +25,8 @@ export const defaultCarValidationMessages = {
   makeRequired: 'Make is required',
   modelRequired: 'Model is required',
   yearInvalid: 'Year must be a whole number',
+  licensePlateRequired: 'License plate is required',
+  licensePlateTooLong: 'License plate is too long',
 } as const;
 
 export type CarValidationMessages = {

@@ -16,6 +16,11 @@ export function createCreateCarBodySchema(messages: CarValidationMessages) {
       .min(1900)
       .max(2100)
       .optional(),
+    licensePlate: z
+      .string()
+      .trim()
+      .min(1, { message: messages.licensePlateRequired })
+      .max(20, { message: messages.licensePlateTooLong }),
     vin: z.string().optional(),
   });
 }
@@ -38,6 +43,11 @@ export function createCreateCarFormSchema(messages: CarValidationMessages) {
           Number.isInteger(Number(value)),
         { message: messages.yearInvalid },
       ),
+    licensePlate: z
+      .string()
+      .trim()
+      .min(1, { message: messages.licensePlateRequired })
+      .max(20, { message: messages.licensePlateTooLong }),
     vin: z.string().optional(),
   });
 }
