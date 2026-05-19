@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { DriverDashboardLayout } from '@/components/driver/DriverDashboardLayout';
 import { BookServicePage } from '@/pages/driver/BookServicePage';
 import { DriverAddCarPage } from '@/pages/driver/DriverAddCarPage.tsx';
+import { DriverEditCarPage } from '@/pages/driver/DriverEditCarPage.tsx';
 import { DashboardCarsPage } from '@/pages/driver/DashboardCarsPage';
 import { DashboardHomePage } from '@/pages/driver/DashboardHomePage';
 import { DashboardMapPage } from '@/pages/driver/DashboardMapPage';
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="map" element={<DashboardMapPage />} />
         <Route path="cars" element={<DashboardCarsPage />} />
         <Route path="cars/new" element={<DriverAddCarPage />} />
+        <Route path="cars/:carId/edit" element={<DriverEditCarPage />} />
         <Route path="history" element={<MaintenanceHistoryPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="services/:stationId" element={<ServiceDetailPage />} />

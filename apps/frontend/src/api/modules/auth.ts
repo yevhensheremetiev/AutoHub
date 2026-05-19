@@ -3,18 +3,14 @@ import type {
   ForgotPasswordRequestBody,
   LoginRequestBody,
   ResetPasswordRequestBody,
+  SignUpRequestBody,
   UpdateProfileRequestBody,
   UserDto,
 } from '@autohub/shared';
 
 import { api } from '@/api/client';
 
-export type SignUpInput = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-};
+export type SignUpInput = SignUpRequestBody;
 
 export type GoogleAuthInput = {
   idToken: string;

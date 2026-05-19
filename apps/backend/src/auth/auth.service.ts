@@ -18,6 +18,7 @@ import type {
 import { MeResponseDto } from './auth.dto';
 import { MailService } from './mail.service';
 import jwt from 'jsonwebtoken';
+import type { Prisma, User as PrismaUser } from '../../prisma/client';
 import {
   createHash,
   randomBytes,
@@ -48,6 +49,7 @@ export class AuthService {
     const email = dto.email.trim().toLowerCase();
     const firstName = dto.firstName.trim();
     const lastName = dto.lastName.trim();
+    const accountType = dto.accountType;
 
     const existingUser = await this.prisma.user.findUnique({
       where: { email },
@@ -58,14 +60,32 @@ export class AuthService {
 
     const passwordHash = await this.hashPassword(dto.password);
 
-    const user = await this.prisma.user.create({
-      data: {
-        id: randomUUID(),
-        email,
-        name: `${firstName} ${lastName}`.trim(),
-        passwordHash,
+    const user = await this.prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const serviceId =
+          accountType === 'SERVICE'
+            ? (
+                await (tx as any).service.create({
+                  data: {
+                    name: (dto.serviceName ?? '').trim(),
+                    address: (dto.serviceAddress ?? '').trim(),
+                  },
+                })
+              ).id
+            : null;
+
+        return tx.user.create({
+          data: {
+            id: randomUUID(),
+            email,
+            name: `${firstName} ${lastName}`.trim(),
+            passwordHash,
+            accountType,
+            serviceId,
+          } as any,
+        });
       },
-    });
+    );
 
     const token = this.createSessionToken(user.id);
 
@@ -156,17 +176,14 @@ export class AuthService {
     return { user, token: this.createSessionToken(user.id) };
   }
 
-  toMeResponse(user: {
-    id: string;
-    email: string | null;
-    name: string | null;
-    passwordHash: string | null;
-  }): MeResponseDto {
+  toMeResponse(user: PrismaUser): MeResponseDto {
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       passwordSignInEnabled: Boolean(user.passwordHash),
+      accountType: (user as any).accountType,
+      serviceId: ((user as any).serviceId ?? null) as string | null,
     };
   }
 
@@ -269,7 +286,10 @@ export class AuthService {
     await this.mail.sendPasswordResetEmail(user.email, resetLink);
   }
 
-  async resetPasswordWithToken(rawToken: string, newPassword: string): Promise<void> {
+  async resetPasswordWithToken(
+    rawToken: string,
+    newPassword: string,
+  ): Promise<void> {
     const trimmed = rawToken.trim();
     if (!trimmed.length) {
       throw new BadRequestException('Invalid or expired reset link');

@@ -12,6 +12,8 @@ export const defaultAuthValidationMessages = {
   passwordSpecial: 'Add at least one special character (!@#$…)',
   confirmPasswordRequired: 'Confirm your password',
   passwordsMustMatch: 'Passwords do not match',
+  serviceNameRequired: 'Service name is required',
+  serviceAddressRequired: 'Service address is required',
   currentPasswordRequired: 'Current password is required',
   displayNameRequired: 'Name is required',
   displayNameTooLong: 'Name is too long (max 120 characters)',
@@ -27,6 +29,7 @@ export const defaultCarValidationMessages = {
   yearInvalid: 'Year must be a whole number',
   licensePlateRequired: 'License plate is required',
   licensePlateTooLong: 'License plate is too long',
+  vinInvalid: 'VIN must be exactly 17 characters',
 } as const;
 
 export type CarValidationMessages = {
@@ -39,4 +42,16 @@ export const defaultGoogleAuthValidationMessages = {
 
 export type GoogleAuthValidationMessages = {
   [K in keyof typeof defaultGoogleAuthValidationMessages]: string;
+};
+
+export const defaultReviewValidationMessages = {
+  bookingIdRequired: 'Booking is required',
+  ratingRequired: 'Rating is required',
+  ratingMustBeInteger: 'Rating must be a whole number',
+  ratingOutOfRange: 'Rating must be between 1 and 5',
+  reviewCommentTooLong: 'Comment is too long',
+} as const;
+
+export type ReviewValidationMessages = {
+  [K in keyof typeof defaultReviewValidationMessages]: string;
 };

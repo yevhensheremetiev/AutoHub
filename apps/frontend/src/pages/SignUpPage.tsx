@@ -24,6 +24,7 @@ export function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [accountType, setAccountType] = useState<'DRIVER' | 'SERVICE'>('DRIVER');
   const signUpMutation = useSignUp();
   const googleSignUpMutation = useGoogleAuth();
 
@@ -42,6 +43,8 @@ export function SignUpPage() {
         passwordSpecial: t('auth.validation.passwordSpecial'),
         confirmPasswordRequired: t('auth.validation.confirmPasswordRequired'),
         passwordsMustMatch: t('auth.validation.passwordsMustMatch'),
+        serviceNameRequired: t('auth.validation.serviceNameRequired'),
+        serviceAddressRequired: t('auth.validation.serviceAddressRequired'),
       }),
     [t, i18n.language],
   );
@@ -49,11 +52,14 @@ export function SignUpPage() {
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      accountType: 'DRIVER',
       firstName: '',
       lastName: '',
       email: '',
       password: '',
       confirmPassword: '',
+      serviceName: '',
+      serviceAddress: '',
     },
   });
 
@@ -68,10 +74,14 @@ export function SignUpPage() {
 
     signUpMutation.mutate(
       {
+        accountType: values.accountType,
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         password: values.password,
+        serviceName: values.accountType === 'SERVICE' ? values.serviceName : undefined,
+        serviceAddress:
+          values.accountType === 'SERVICE' ? values.serviceAddress : undefined,
       },
       {
         onSuccess: () => {
@@ -150,6 +160,60 @@ export function SignUpPage() {
             </Text>
 
             <form className="mt-8 space-y-5" onSubmit={onSubmit}>
+              <div className="space-y-2">
+                <Text as="p" className="text-sm font-medium leading-none text-slate-200">
+                  {t('auth.accountTypeLabel')}
+                </Text>
+                <div
+                  className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/30 p-1"
+                  role="tablist"
+                  aria-label={t('auth.accountTypeLabel')}
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={accountType === 'DRIVER'}
+                    className={cn(
+                      'h-10 rounded-xl text-sm font-medium transition',
+                      accountType === 'DRIVER'
+                        ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
+                        : 'text-slate-300 hover:bg-slate-900/40',
+                    )}
+                    onClick={() => {
+                      setAccountType('DRIVER');
+                      form.setValue('accountType', 'DRIVER', {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                      form.setValue('serviceName', '', { shouldDirty: true });
+                      form.setValue('serviceAddress', '', { shouldDirty: true });
+                    }}
+                  >
+                    {t('auth.accountTypeDriver')}
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={accountType === 'SERVICE'}
+                    className={cn(
+                      'h-10 rounded-xl text-sm font-medium transition',
+                      accountType === 'SERVICE'
+                        ? 'bg-primary/15 text-primary ring-1 ring-primary/40'
+                        : 'text-slate-300 hover:bg-slate-900/40',
+                    )}
+                    onClick={() => {
+                      setAccountType('SERVICE');
+                      form.setValue('accountType', 'SERVICE', {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                  >
+                    {t('auth.accountTypeService')}
+                  </button>
+                </div>
+              </div>
+
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-1">
                   <label
@@ -232,6 +296,62 @@ export function SignUpPage() {
                   </Text>
                 ) : null}
               </div>
+
+              {accountType === 'SERVICE' ? (
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="signup-service-name"
+                      className="text-sm font-medium leading-none text-slate-200"
+                    >
+                      {t('auth.serviceNameLabel')}
+                    </label>
+                    <input
+                      id="signup-service-name"
+                      type="text"
+                      placeholder={t('auth.serviceNamePlaceholder')}
+                      className={cn(
+                        inputClass,
+                        (form.formState.errors as any).serviceName
+                          ? 'border-destructive'
+                          : 'border-slate-700',
+                      )}
+                      {...form.register('serviceName')}
+                    />
+                    {(form.formState.errors as any).serviceName ? (
+                      <Text className="text-xs text-destructive">
+                        {(form.formState.errors as any).serviceName.message as string}
+                      </Text>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="signup-service-address"
+                      className="text-sm font-medium leading-none text-slate-200"
+                    >
+                      {t('auth.serviceAddressLabel')}
+                    </label>
+                    <input
+                      id="signup-service-address"
+                      type="text"
+                      placeholder={t('auth.serviceAddressPlaceholder')}
+                      className={cn(
+                        inputClass,
+                        (form.formState.errors as any).serviceAddress
+                          ? 'border-destructive'
+                          : 'border-slate-700',
+                      )}
+                      {...form.register('serviceAddress')}
+                    />
+                    {(form.formState.errors as any).serviceAddress ? (
+                      <Text className="text-xs text-destructive">
+                        {(form.formState.errors as any).serviceAddress.message as string}
+                      </Text>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
 
               <div className="space-y-2">
                 <label
@@ -368,22 +488,24 @@ export function SignUpPage() {
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="h-11 w-full rounded-full border-slate-600 bg-slate-950/40 text-slate-100 shadow-sm hover:border-slate-500 hover:bg-slate-900/80"
-              disabled={googleSignUpMutation.isPending || signUpMutation.isPending}
-              onClick={() => void handleGoogleSignUp()}
-            >
-              <img
-                src={googleIcon}
-                alt=""
-                className="mr-2 h-5 w-5 shrink-0"
-                aria-hidden
-              />
-              {t('auth.signUpWithGoogle')}
-            </Button>
+            {accountType !== 'SERVICE' ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="h-11 w-full rounded-full border-slate-600 bg-slate-950/40 text-slate-100 shadow-sm hover:border-slate-500 hover:bg-slate-900/80"
+                disabled={googleSignUpMutation.isPending || signUpMutation.isPending}
+                onClick={() => void handleGoogleSignUp()}
+              >
+                <img
+                  src={googleIcon}
+                  alt=""
+                  className="mr-2 h-5 w-5 shrink-0"
+                  aria-hidden
+                />
+                {t('auth.signUpWithGoogle')}
+              </Button>
+            ) : null}
 
             <Text
               as="p"

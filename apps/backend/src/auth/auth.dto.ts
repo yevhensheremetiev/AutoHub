@@ -3,4 +3,6 @@ export class MeResponseDto {
   email!: string | null;
   name!: string | null;
   passwordSignInEnabled!: boolean;
+  accountType!: 'DRIVER' | 'SERVICE';
+  serviceId!: string | null;
 }

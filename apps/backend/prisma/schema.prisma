@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./client"
 }
 
 datasource db {
@@ -12,13 +13,110 @@ model User {
   email     String?  @unique
   name      String?
   passwordHash String?
+  accountType AccountType @default(DRIVER)
+  serviceId   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   cars                Car[]
   passwordResetTokens PasswordResetToken[]
+  bookings            Booking[]
+  reviews             Review[]
+  service             Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
 
+  @@index([serviceId])
   @@map("users")
+}
+
+enum AccountType {
+  DRIVER
+  SERVICE
+}
+
+model Service {
+  id           String   @id @default(cuid())
+  name         String
+  address      String
+  /** Average of all review ratings for bookings at this service. */
+  ratingAvg    Float?
+  ratingCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  users     User[]
+  offerings Offering[]
+  bookings  Booking[]
+
+  @@map("services")
+}
+
+model Offering {
+  id              String   @id @default(cuid())
+  serviceId       String
+  name            String
+  description     String?
+  durationMinutes Int
+  priceUah        Int
+  /** Average of review ratings for bookings of this offering only. */
+  ratingAvg       Float?
+  ratingCount     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  service  Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([serviceId])
+  @@map("offerings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  userId      String
+  carId       String
+  serviceId   String
+  offeringId  String
+  scheduledAt DateTime
+  status      BookingStatus @default(PENDING)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  car      Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  offering Offering @relation(fields: [offeringId], references: [id], onDelete: Restrict)
+  review   Review?
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([offeringId])
+  @@index([scheduledAt])
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  bookingId String   @unique
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("reviews")
 }
 
 model PasswordResetToken {
@@ -45,7 +143,8 @@ model Car {
   vin           String?  @unique
   createdAt     DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
   @@unique([userId, licensePlate])
   @@index([userId])

@@ -2,13 +2,16 @@ import type { CarDto } from '@autohub/shared';
 
 import { api } from '@/api/client';
 
-export type CreateCarInput = {
+export type CarInput = {
   make: string;
   model: string;
   year?: number;
   licensePlate: string;
   vin?: string;
 };
+
+export type CreateCarInput = CarInput;
+export type UpdateCarInput = CarInput;
 
 export async function getCars(): Promise<CarDto[]> {
   const res = await api.get<CarDto[]>('/cars');
@@ -17,5 +20,13 @@ export async function getCars(): Promise<CarDto[]> {
 
 export async function createCar(input: CreateCarInput): Promise<CarDto> {
   const res = await api.post<CarDto>('/cars', input);
+  return res.data;
+}
+
+export async function updateCar(
+  carId: string,
+  input: UpdateCarInput,
+): Promise<CarDto> {
+  const res = await api.patch<CarDto>(`/cars/${carId}`, input);
   return res.data;
 }

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Car, Plus } from 'lucide-react';
+import { Car, Pencil, Plus } from 'lucide-react';
 
 import { useCars } from '@/api/queries/cars';
 import { Text } from '@/components/ui/text';
@@ -64,7 +64,22 @@ export function DashboardCarsPage() {
               >
                 {car.licensePlate ?? '—'}
               </Text>
+              {car.vin ? (
+                <Text className="mt-1 font-mono text-xs text-slate-500">
+                  {t('driver.carsVin', { vin: car.vin })}
+                </Text>
+              ) : null}
             </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="shrink-0 text-slate-300 hover:bg-slate-800/70 hover:text-slate-50"
+              aria-label={t('driver.editCarCta')}
+              onClick={() => navigate(`/dashboard/cars/${car.id}/edit`)}
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+            </Button>
           </li>
             ))
           : null}

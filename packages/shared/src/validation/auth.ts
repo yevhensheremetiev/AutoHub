@@ -127,25 +127,47 @@ export function createSignUpSchema(
     | 'passwordSpecial'
     | 'confirmPasswordRequired'
     | 'passwordsMustMatch'
+    | 'serviceNameRequired'
+    | 'serviceAddressRequired'
   >,
 ) {
-  return z
-    .object({
-      firstName: z
-        .string()
-        .min(1, { message: messages.firstNameRequired }),
-      lastName: z.string().min(1, { message: messages.lastNameRequired }),
-      email: z
-        .string()
-        .min(1, { message: messages.emailRequired })
-        .email({ message: messages.emailInvalid }),
-      password: z
-        .string()
-        .min(1, { message: messages.passwordRequired })
-        .pipe(createStrongPasswordSchema(messages)),
-      confirmPassword: z
-        .string()
-        .min(1, { message: messages.confirmPasswordRequired }),
+  const base = z.object({
+    accountType: z.enum(['DRIVER', 'SERVICE']),
+    firstName: z.string().min(1, { message: messages.firstNameRequired }),
+    lastName: z.string().min(1, { message: messages.lastNameRequired }),
+    email: z
+      .string()
+      .min(1, { message: messages.emailRequired })
+      .email({ message: messages.emailInvalid }),
+    password: z
+      .string()
+      .min(1, { message: messages.passwordRequired })
+      .pipe(createStrongPasswordSchema(messages)),
+    confirmPassword: z
+      .string()
+      .min(1, { message: messages.confirmPasswordRequired }),
+    serviceName: z.string().trim().optional(),
+    serviceAddress: z.string().trim().optional(),
+  });
+
+  return base
+    .superRefine((data, ctx) => {
+      if (data.accountType === 'SERVICE') {
+        if (!data.serviceName?.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: messages.serviceNameRequired,
+            path: ['serviceName'],
+          });
+        }
+        if (!data.serviceAddress?.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: messages.serviceAddressRequired,
+            path: ['serviceAddress'],
+          });
+        }
+      }
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: messages.passwordsMustMatch,
@@ -168,9 +190,12 @@ export function createSignUpRequestSchema(
     | 'passwordUppercase'
     | 'passwordDigit'
     | 'passwordSpecial'
+    | 'serviceNameRequired'
+    | 'serviceAddressRequired'
   >,
 ) {
-  return z.object({
+  const base = z.object({
+    accountType: z.enum(['DRIVER', 'SERVICE']),
     firstName: z.string().min(1, { message: messages.firstNameRequired }),
     lastName: z.string().min(1, { message: messages.lastNameRequired }),
     email: z
@@ -181,6 +206,27 @@ export function createSignUpRequestSchema(
       .string()
       .min(1, { message: messages.passwordRequired })
       .pipe(createStrongPasswordSchema(messages)),
+    serviceName: z.string().trim().optional(),
+    serviceAddress: z.string().trim().optional(),
+  });
+
+  return base.superRefine((data, ctx) => {
+    if (data.accountType === 'SERVICE') {
+      if (!data.serviceName?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: messages.serviceNameRequired,
+          path: ['serviceName'],
+        });
+      }
+      if (!data.serviceAddress?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: messages.serviceAddressRequired,
+          path: ['serviceAddress'],
+        });
+      }
+    }
   });
 }
 

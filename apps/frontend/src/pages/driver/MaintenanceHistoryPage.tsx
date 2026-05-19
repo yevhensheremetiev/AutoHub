@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { Calendar, Wrench } from 'lucide-react';
 
 import { Text } from '@/components/ui/text';
-import { MOCK_MAINTENANCE_HISTORY } from '@/mocks/driver-dashboard';
+import {
+  getCarLabel,
+  MOCK_MAINTENANCE_HISTORY,
+} from '@/mocks/driver-dashboard';
 
 export function MaintenanceHistoryPage() {
   const { t } = useTranslation();
@@ -52,7 +55,7 @@ export function MaintenanceHistoryPage() {
                   {item.date}
                 </span>
                 <span aria-hidden>·</span>
-                <span>{item.carLabel}</span>
+                <span>{getCarLabel(item.carId)}</span>
                 <span aria-hidden>·</span>
                 <span>{t('driver.priceUah', { price: item.priceUah })}</span>
               </div>

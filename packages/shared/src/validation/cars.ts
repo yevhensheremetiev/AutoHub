@@ -5,23 +5,49 @@ import {
   type CarValidationMessages,
 } from './defaults.js';
 
-/** POST /cars JSON body (API). */
-export function createCreateCarBodySchema(messages: CarValidationMessages) {
-  return z.object({
-    make: z.string().min(1, { message: messages.makeRequired }),
-    model: z.string().min(1, { message: messages.modelRequired }),
-    year: z
+const optionalVinSchema = (messages: CarValidationMessages) =>
+  z.preprocess(
+    (value) => {
+      if (value === null || value === undefined) return undefined;
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        return trimmed === '' ? undefined : trimmed;
+      }
+      return value;
+    },
+    z
+      .string()
+      .length(17, { message: messages.vinInvalid })
+      .optional(),
+  );
+
+const optionalYearSchema = (messages: CarValidationMessages) =>
+  z.preprocess(
+    (value) => {
+      if (value === '' || value === null || value === undefined) return undefined;
+      const num = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(num) ? num : value;
+    },
+    z
       .number()
       .int({ message: messages.yearInvalid })
       .min(1900)
       .max(2100)
       .optional(),
+  );
+
+/** POST /cars JSON body (API). */
+export function createCreateCarBodySchema(messages: CarValidationMessages) {
+  return z.object({
+    make: z.string().min(1, { message: messages.makeRequired }),
+    model: z.string().min(1, { message: messages.modelRequired }),
+    year: optionalYearSchema(messages),
     licensePlate: z
       .string()
       .trim()
       .min(1, { message: messages.licensePlateRequired })
       .max(20, { message: messages.licensePlateTooLong }),
-    vin: z.string().optional(),
+    vin: optionalVinSchema(messages),
   });
 }
 
@@ -48,7 +74,7 @@ export function createCreateCarFormSchema(messages: CarValidationMessages) {
       .trim()
       .min(1, { message: messages.licensePlateRequired })
       .max(20, { message: messages.licensePlateTooLong }),
-    vin: z.string().optional(),
+    vin: optionalVinSchema(messages),
   });
 }
 
@@ -61,3 +87,7 @@ export const createCarBodySchema = createCreateCarBodySchema(
 );
 
 export type CreateCarBody = z.infer<typeof createCarBodySchema>;
+
+export const updateCarBodySchema = createCarBodySchema;
+
+export type UpdateCarBody = z.infer<typeof updateCarBodySchema>;
