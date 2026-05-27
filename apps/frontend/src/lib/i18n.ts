@@ -7,6 +7,12 @@ const resources = {
     translation: {
       common: {
         appName: 'AutoHub',
+        datePicker: {
+          placeholder: 'Select date',
+          dialogLabel: 'Choose a date',
+          previousMonth: 'Previous month',
+          nextMonth: 'Next month',
+        },
       },
       home: {
         titleLine1: 'Service your car with less back-and-forth.',
@@ -289,6 +295,7 @@ const resources = {
           fieldNotes: 'Notes for the station',
           notesPlaceholder: '',
           selectTime: 'Select time',
+          selectDate: 'Select date',
           submit: 'Confirm booking',
           successTitle: 'Booking request sent',
           successBody:
@@ -359,6 +366,36 @@ const resources = {
         history: {
           statusDone: 'Completed',
         },
+        reviews: {
+          sectionTitle: 'Customer reviews',
+          sectionHint: 'What drivers say about this station.',
+          empty: 'No reviews yet.',
+          count_one: '{{count}} review',
+          count_other: '{{count}} reviews',
+          leaveReview: 'Leave a review',
+          yourReview: 'Your review',
+          formTitle: 'Rate this visit',
+          commentLabel: 'Your review',
+          commentPlaceholder: 'Share your experience (at least 10 characters)…',
+          submit: 'Submit review',
+          cancel: 'Cancel',
+          you: 'You',
+          validation: {
+            ratingRequired: 'Please select a rating from 1 to 5 stars',
+            commentMin: 'Please write at least 10 characters',
+            commentMax: 'Comment is too long (max 2000 characters)',
+          },
+          seed: {
+            h1: 'Quick oil change, friendly staff. Everything was explained clearly.',
+            h3: 'Seasonal tire swap went smoothly. Slightly busy on Saturday morning.',
+            sparkWash1:
+              'Excellent wash — car looks brand new. Interior cleaning was thorough.',
+            sparkWash2:
+              'Good quality for the price. Had to wait about 15 minutes.',
+            autoDoc1:
+              'Professional diagnostics. Received a clear report with photos.',
+          },
+        },
       },
       languageSwitcher: {
         label: 'Language',
@@ -371,6 +408,12 @@ const resources = {
     translation: {
       common: {
         appName: 'AutoHub',
+        datePicker: {
+          placeholder: 'Оберіть дату',
+          dialogLabel: 'Вибір дати',
+          previousMonth: 'Попередній місяць',
+          nextMonth: 'Наступний місяць',
+        },
       },
       home: {
         titleLine1: 'Сервіс авто без зайвих дзвінків і переписок.',
@@ -654,6 +697,7 @@ const resources = {
           fieldNotes: 'Коментар для станції',
           notesPlaceholder: '',
           selectTime: 'Оберіть час',
+          selectDate: 'Оберіть дату',
           submit: 'Підтвердити запис',
           successTitle: 'Запит надіслано',
           successBody:
@@ -720,6 +764,40 @@ const resources = {
         historySubtitle: 'Завершені візити та послуги.',
         history: {
           statusDone: 'Виконано',
+        },
+        reviews: {
+          sectionTitle: 'Відгуки клієнтів',
+          sectionHint: 'Що кажуть водії про цю станцію.',
+          empty: 'Поки немає відгуків.',
+          count_one: '{{count}} відгук',
+          count_few: '{{count}} відгуки',
+          count_many: '{{count}} відгуків',
+          count_other: '{{count}} відгуків',
+          leaveReview: 'Залишити відгук',
+          yourReview: 'Ваш відгук',
+          formTitle: 'Оцініть цей візит',
+          commentLabel: 'Ваш відгук',
+          commentPlaceholder:
+            'Опишіть враження (мінімум 10 символів)…',
+          submit: 'Надіслати відгук',
+          cancel: 'Скасувати',
+          you: 'Ви',
+          validation: {
+            ratingRequired: 'Оберіть оцінку від 1 до 5 зірок',
+            commentMin: 'Напишіть щонайменше 10 символів',
+            commentMax: 'Коментар занадто довгий (макс. 2000 символів)',
+          },
+          seed: {
+            h1: 'Швидка заміна масла, привітний персонал. Усе пояснили зрозуміло.',
+            h3:
+              'Сезонна перестановка шин пройшла без проблем. У суботу вранці було трохи людно.',
+            sparkWash1:
+              'Чудова мийка — авто як нове. Салон прибрали ретельно.',
+            sparkWash2:
+              'Гарна якість за ціною. Довелося почекати близько 15 хвилин.',
+            autoDoc1:
+              'Професійна діагностика. Отримав зрозумілий звіт із фото.',
+          },
         },
       },
       languageSwitcher: {

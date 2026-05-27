@@ -2,13 +2,16 @@ import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Clock, MapPin, Star } from 'lucide-react';
 
+import { StationReviewsSection } from '@/components/driver/StationReviewsSection';
 import { Text } from '@/components/ui/text';
+import { useStationReviews } from '@/hooks/useMockReviews';
 import { getStationById, MOCK_LOCATIONS } from '@/mocks/driver-dashboard';
 
 export function ServiceDetailPage() {
   const { stationId } = useParams<{ stationId: string }>();
   const { t } = useTranslation();
   const station = stationId ? getStationById(stationId) : undefined;
+  const { ratingAverage, reviewCount } = useStationReviews(stationId);
 
   if (!station) {
     return (
@@ -58,7 +61,13 @@ export function ServiceDetailPage() {
               className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-3 py-1 text-sm font-medium text-amber-200"
             >
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              {station.rating.toFixed(1)}
+              {(ratingAverage ?? station.rating).toFixed(1)}
+              {reviewCount > 0 && (
+                <span className="text-amber-200/70">
+                  {' '}
+                  ({t('driver.reviews.count', { count: reviewCount })})
+                </span>
+              )}
             </Text>
             <Text
               as="span"
@@ -113,6 +122,8 @@ export function ServiceDetailPage() {
           ))}
         </ul>
       </section>
+
+      <StationReviewsSection stationId={station.id} />
     </div>
   );
 }

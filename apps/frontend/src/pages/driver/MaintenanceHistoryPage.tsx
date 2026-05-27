@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Calendar, Wrench } from 'lucide-react';
 
+import { HistoryReviewBlock } from '@/components/driver/HistoryReviewBlock';
 import { Text } from '@/components/ui/text';
 import {
   getCarLabel,
@@ -59,6 +60,10 @@ export function MaintenanceHistoryPage() {
                 <span aria-hidden>·</span>
                 <span>{t('driver.priceUah', { price: item.priceUah })}</span>
               </div>
+              <HistoryReviewBlock
+                historyItemId={item.id}
+                stationId={item.stationId}
+              />
             </div>
           </li>
         ))}
