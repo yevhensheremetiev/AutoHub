@@ -2,15 +2,16 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
+import type { ReviewListItemDto } from '@autohub/shared';
 import { z } from 'zod';
 import type { TFunction } from 'i18next';
 import { Star } from 'lucide-react';
 
+import { useCreateReview } from '@/api';
 import { StarRating } from '@/components/driver/StarRating';
 import { StarRatingInput } from '@/components/driver/StarRatingInput';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getReviewComment, useHistoryReview } from '@/hooks/useMockReviews';
 import { cn } from '@/lib/utils';
 
 function createLeaveReviewSchema(t: TFunction) {
@@ -31,16 +32,25 @@ function createLeaveReviewSchema(t: TFunction) {
 type LeaveReviewFormValues = z.infer<ReturnType<typeof createLeaveReviewSchema>>;
 
 type HistoryReviewBlockProps = {
-  historyItemId: string;
-  stationId: string;
+  bookingId: string;
+  existingReview: ReviewListItemDto | null;
 };
 
+function formatReviewDate(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
 export function HistoryReviewBlock({
-  historyItemId,
-  stationId,
+  bookingId,
+  existingReview,
 }: HistoryReviewBlockProps) {
-  const { t } = useTranslation();
-  const { review, hasReview, submitReview } = useHistoryReview(historyItemId);
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'uk' ? 'uk-UA' : 'en-GB';
+  const createReviewMutation = useCreateReview();
   const [expanded, setExpanded] = useState(false);
 
   const schema = useMemo(() => createLeaveReviewSchema(t), [t]);
@@ -52,7 +62,7 @@ export function HistoryReviewBlock({
 
   const rating = form.watch('rating');
 
-  if (hasReview && review) {
+  if (existingReview) {
     return (
       <div className="mt-3 rounded-xl border border-slate-800/60 bg-slate-950/30 p-3">
         <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -60,12 +70,16 @@ export function HistoryReviewBlock({
           <span>{t('driver.reviews.yourReview')}</span>
         </div>
         <div className="mt-2 flex items-center gap-2">
-          <StarRating value={review.rating} />
-          <Text className="text-xs text-slate-500">{review.createdAt}</Text>
+          <StarRating value={existingReview.rating} />
+          <Text className="text-xs text-slate-500">
+            {formatReviewDate(existingReview.createdAt, locale)}
+          </Text>
         </div>
-        <Text className="mt-2 text-sm text-slate-300">
-          {getReviewComment(review, t)}
-        </Text>
+        {existingReview.comment ? (
+          <Text className="mt-2 text-sm text-slate-300">
+            {existingReview.comment}
+          </Text>
+        ) : null}
       </div>
     );
   }
@@ -85,21 +99,24 @@ export function HistoryReviewBlock({
   }
 
   const onSubmit = form.handleSubmit((values) => {
-    const result = submitReview({
-      historyItemId,
-      stationId,
-      rating: values.rating,
-      comment: values.comment,
-    });
-    if (result) {
-      setExpanded(false);
-      form.reset();
-    }
+    createReviewMutation.mutate(
+      {
+        bookingId,
+        rating: values.rating,
+        comment: values.comment,
+      },
+      {
+        onSuccess: () => {
+          setExpanded(false);
+          form.reset();
+        },
+      },
+    );
   });
 
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={(e) => void onSubmit(e)}
       className="mt-3 space-y-3 rounded-xl border border-slate-800/60 bg-slate-950/30 p-3"
     >
       <Text className="text-xs font-medium text-slate-400">
@@ -121,11 +138,11 @@ export function HistoryReviewBlock({
       </div>
 
       <div>
-        <label htmlFor={`review-comment-${historyItemId}`} className="sr-only">
+        <label htmlFor={`review-comment-${bookingId}`} className="sr-only">
           {t('driver.reviews.commentLabel')}
         </label>
         <textarea
-          id={`review-comment-${historyItemId}`}
+          id={`review-comment-${bookingId}`}
           rows={3}
           placeholder={t('driver.reviews.commentPlaceholder')}
           className={cn(
@@ -142,7 +159,12 @@ export function HistoryReviewBlock({
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" size="sm" className="h-8 rounded-lg text-xs">
+        <Button
+          type="submit"
+          size="sm"
+          className="h-8 rounded-lg text-xs"
+          disabled={createReviewMutation.isPending}
+        >
           {t('driver.reviews.submit')}
         </Button>
         <Button

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { GeocodingService } from '../geocoding/geocoding.service';
 import { FIREBASE_ADMIN } from '../firebase/firebase.module';
 import type { App } from 'firebase-admin/app';
 import type {
@@ -18,7 +19,7 @@ import type {
 import { MeResponseDto } from './auth.dto';
 import { MailService } from './mail.service';
 import jwt from 'jsonwebtoken';
-import type { Prisma, User as PrismaUser } from '../../prisma/client';
+import type { Prisma, User as PrismaUser } from '@prisma/client';
 import {
   createHash,
   randomBytes,
@@ -42,6 +43,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly mail: MailService,
+    private readonly geocoding: GeocodingService,
     @Inject(FIREBASE_ADMIN) private readonly firebaseApp: App,
   ) {}
 
@@ -60,6 +62,11 @@ export class AuthService {
 
     const passwordHash = await this.hashPassword(dto.password);
 
+    const serviceAddress =
+      accountType === 'SERVICE' ? (dto.serviceAddress ?? '').trim() : '';
+    const serviceGeo =
+      serviceAddress ? await this.geocoding.geocode(serviceAddress) : null;
+
     const user = await this.prisma.$transaction(
       async (tx: Prisma.TransactionClient) => {
         const serviceId =
@@ -68,7 +75,10 @@ export class AuthService {
                 await (tx as any).service.create({
                   data: {
                     name: (dto.serviceName ?? '').trim(),
-                    address: (dto.serviceAddress ?? '').trim(),
+                    address: serviceAddress,
+                    ...(serviceGeo
+                      ? { lat: serviceGeo.lat, lng: serviceGeo.lng }
+                      : {}),
                   },
                 })
               ).id

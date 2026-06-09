@@ -1,3 +1,7 @@
+import type { BookingStatus } from './validation/service-center.js';
+
+export type { BookingStatus } from './validation/service-center.js';
+
 export type Brand<K, T> = K & { __brand: T };
 
 export type UserDto = {
@@ -37,9 +41,125 @@ export type OfferingDto = {
   description?: string | null;
   durationMinutes: number;
   priceUah: number;
+  active?: boolean;
   /** Cached average from reviews for this offering only; null when no reviews. */
   ratingAvg: number | null;
   ratingCount: number;
+};
+
+export type ServiceCenterProfileDto = ServiceDto & {
+  phone: string | null;
+  hours: string | null;
+  serviceType: ServiceType | null;
+  locationArea: ServiceLocationArea | null;
+  lat: number | null;
+  lng: number | null;
+};
+
+export type ServiceType =
+  | 'wash'
+  | 'repair'
+  | 'tire'
+  | 'diagnostic';
+
+export type ServiceLocationArea =
+  | 'center'
+  | 'left-bank'
+  | 'right-bank';
+
+export type PublicOfferingDto = {
+  id: string;
+  name: string;
+  description: string | null;
+  durationMinutes: number;
+  priceUah: number;
+};
+
+export type PublicServiceListItemDto = {
+  id: string;
+  name: string;
+  address: string;
+  serviceType: ServiceType;
+  locationArea: ServiceLocationArea;
+  lat: number;
+  lng: number;
+  ratingAvg: number | null;
+  ratingCount: number;
+};
+
+export type PublicServiceDetailDto = PublicServiceListItemDto & {
+  phone: string | null;
+  hours: string | null;
+  offerings: PublicOfferingDto[];
+};
+
+export type ReviewListItemDto = {
+  id: string;
+  bookingId: string;
+  rating: number;
+  comment: string | null;
+  authorName: string;
+  createdAt: string;
+};
+
+export type DriverBookingSummaryDto = {
+  id: string;
+  scheduledAt: string;
+  status: BookingStatus;
+  serviceId: string;
+  serviceName: string;
+  offeringName: string;
+  carLabel: string;
+  priceUah: number;
+};
+
+export type DriverDashboardDto = {
+  metrics: {
+    visitsThisYear: number;
+    spentThisYearUah: number;
+    carsCount: number;
+  };
+  upcomingBookings: DriverBookingSummaryDto[];
+};
+
+export type DriverHistoryItemDto = DriverBookingSummaryDto & {
+  hasReview: boolean;
+  review: ReviewListItemDto | null;
+};
+
+export const BOOKING_TIME_SLOTS = [
+  '09:00',
+  '10:00',
+  '11:30',
+  '13:00',
+  '14:30',
+  '16:00',
+  '17:30',
+] as const;
+
+export type ServiceCenterOfferingDto = OfferingDto & {
+  active: boolean;
+};
+
+export type ServiceCenterBookingDto = {
+  id: string;
+  status: BookingStatus;
+  scheduledAt: string;
+  notes: string | null;
+  clientName: string;
+  clientEmail: string | null;
+  carLabel: string;
+  offeringId: string;
+  offeringName: string;
+};
+
+export type ServiceCenterDashboardDto = {
+  metrics: {
+    todayCount: number;
+    weekCount: number;
+    ratingAvg: number | null;
+  };
+  todayBookings: ServiceCenterBookingDto[];
 };
 
 export * from './validation/index.js';

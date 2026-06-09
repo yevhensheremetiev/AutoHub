@@ -6,15 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ArrowLeft } from 'lucide-react';
 
-import { useCars } from '@/api/queries/cars';
+import {
+  useBookingTimeSlots,
+  useCars,
+  useCreateBooking,
+  useService,
+} from '@/api';
 import { Button } from '@/components/ui/button';
 import { DatePicker, toIsoDate } from '@/components/ui/date-picker';
 import { Text } from '@/components/ui/text';
-import {
-  getOffering,
-  getStationById,
-  MOCK_TIME_SLOTS,
-} from '@/mocks/driver-dashboard';
 import { cn } from '@/lib/utils';
 
 function createBookSchema(t: (k: string) => string) {
@@ -35,8 +35,9 @@ export function BookServicePage() {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const { data: cars = [] } = useCars();
+  const { data: station, isLoading, isError } = useService(stationId);
+  const createBookingMutation = useCreateBooking();
 
-  const station = stationId ? getStationById(stationId) : undefined;
   const offerFromQuery = searchParams.get('offer') ?? '';
 
   const bookSchema = useMemo(() => createBookSchema(t), [t]);
@@ -52,6 +53,9 @@ export function BookServicePage() {
     },
   });
 
+  const watchedDate = useWatch({ control: form.control, name: 'date' });
+  const { data: timeSlotsData } = useBookingTimeSlots(watchedDate ?? '');
+
   useEffect(() => {
     if (cars.length === 0) return;
     const current = form.getValues('carId');
@@ -61,13 +65,12 @@ export function BookServicePage() {
   }, [cars, form]);
 
   useEffect(() => {
-    if (!stationId) return;
-    const st = getStationById(stationId);
-    if (!st) return;
+    if (!station) return;
     const oid =
-      offerFromQuery && st.offerings.some((o) => o.id === offerFromQuery)
+      offerFromQuery &&
+      station.offerings.some((o) => o.id === offerFromQuery)
         ? offerFromQuery
-        : (st.offerings[0]?.id ?? '');
+        : (station.offerings[0]?.id ?? '');
     form.reset({
       offeringId: oid,
       carId: cars[0]?.id ?? '',
@@ -75,19 +78,21 @@ export function BookServicePage() {
       time: '',
       notes: '',
     });
-  }, [stationId, offerFromQuery, form, cars]);
+  }, [station, offerFromQuery, form, cars]);
 
   const offeringId = useWatch({
     control: form.control,
     name: 'offeringId',
     defaultValue: '',
   });
-  const selected =
-    station && offeringId
-      ? getOffering(station.id, offeringId)
-      : undefined;
 
-  if (!station) {
+  const selectedOffering = station?.offerings.find((o) => o.id === offeringId);
+
+  if (isLoading) {
+    return <Text variant="muted">{t('driver.loading')}</Text>;
+  }
+
+  if (isError || !station) {
     return (
       <div className="space-y-4">
         <Text as="h1" variant="h3" className="text-slate-50">
@@ -104,12 +109,23 @@ export function BookServicePage() {
   }
 
   const todayIso = toIsoDate(new Date());
+  const timeSlots = timeSlotsData?.slots ?? [];
 
   const inputClass =
     'flex h-11 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3.5 text-sm text-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70';
 
-  const onSubmit = form.handleSubmit(() => {
-    setSubmitted(true);
+  const onSubmit = form.handleSubmit((values) => {
+    createBookingMutation.mutate(
+      {
+        serviceId: station.id,
+        offeringId: values.offeringId,
+        carId: values.carId,
+        date: values.date,
+        time: values.time,
+        notes: values.notes,
+      },
+      { onSuccess: () => setSubmitted(true) },
+    );
   });
 
   const linkBtnSecondary =
@@ -126,10 +142,10 @@ export function BookServicePage() {
         </Text>
         <div className="flex flex-wrap gap-2 pt-2">
           <Link
-            to="/dashboard/map"
+            to="/dashboard"
             className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
           >
-            {t('driver.backToMap')}
+            {t('driver.navHome')}
           </Link>
           <Link
             to={`/dashboard/services/${station.id}`}
@@ -150,32 +166,32 @@ export function BookServicePage() {
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-400 transition hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          {t("driver.backToStation")}
+          {t('driver.backToStation')}
         </Link>
         <Text as="h1" variant="h3" className="text-slate-50">
-          {t("driver.book.title")}
+          {t('driver.book.title')}
         </Text>
         <Text className="mt-1 text-slate-400" variant="muted">
-          {t(station.nameKey)}
+          {station.name}
         </Text>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5">
+      <form onSubmit={(e) => void onSubmit(e)} className="space-y-5">
         <div className="space-y-2">
           <label htmlFor="book-offering" className="text-sm text-slate-200">
-            {t("driver.book.fieldService")}
+            {t('driver.book.fieldService')}
           </label>
           <select
             id="book-offering"
             className={cn(
               inputClass,
-              form.formState.errors.offeringId ? "border-destructive" : "",
+              form.formState.errors.offeringId ? 'border-destructive' : '',
             )}
-            {...form.register("offeringId")}
+            {...form.register('offeringId')}
           >
             {station.offerings.map((o) => (
               <option key={o.id} value={o.id}>
-                {t(o.nameKey)} — {t("driver.priceUah", { price: o.priceUah })}
+                {o.name} — {t('driver.priceUah', { price: o.priceUah })}
               </option>
             ))}
           </select>
@@ -186,26 +202,26 @@ export function BookServicePage() {
           ) : null}
         </div>
 
-        {selected ? (
+        {selectedOffering ? (
           <Text className="text-xs text-slate-500" variant="muted">
-            {t("driver.durationMinutes", {
-              count: selected.offering.durationMin,
+            {t('driver.durationMinutes', {
+              count: selectedOffering.durationMinutes,
             })}
           </Text>
         ) : null}
 
         <div className="space-y-2">
           <label htmlFor="book-car" className="text-sm text-slate-200">
-            {t("driver.book.fieldCar")}
+            {t('driver.book.fieldCar')}
           </label>
           {cars.length === 0 ? (
             <Text className="text-sm text-amber-200/90">
-              {t("driver.book.noCarsHint")}{" "}
+              {t('driver.book.noCarsHint')}{' '}
               <Link
                 to="/dashboard/cars/new"
                 className="font-medium text-primary underline underline-offset-2 hover:text-primary/90"
               >
-                {t("driver.addCarCta")}
+                {t('driver.addCarCta')}
               </Link>
             </Text>
           ) : (
@@ -214,15 +230,15 @@ export function BookServicePage() {
                 id="book-car"
                 className={cn(
                   inputClass,
-                  form.formState.errors.carId ? "border-destructive" : "",
+                  form.formState.errors.carId ? 'border-destructive' : '',
                 )}
-                {...form.register("carId")}
+                {...form.register('carId')}
               >
                 {cars.map((car) => (
                   <option key={car.id} value={car.id}>
                     {car.make} {car.model}
-                    {car.year != null ? ` (${car.year})` : ""} ·{" "}
-                    {car.licensePlate ?? "—"}
+                    {car.year != null ? ` (${car.year})` : ''} ·{' '}
+                    {car.licensePlate ?? '—'}
                   </option>
                 ))}
               </select>
@@ -238,7 +254,7 @@ export function BookServicePage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <label htmlFor="book-date" className="text-sm text-slate-200">
-              {t("driver.book.fieldDate")}
+              {t('driver.book.fieldDate')}
             </label>
             <Controller
               control={form.control}
@@ -247,8 +263,11 @@ export function BookServicePage() {
                 <DatePicker
                   id="book-date"
                   value={field.value}
-                  onChange={field.onChange}
-                  placeholder={t("driver.book.selectDate")}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    form.setValue('time', '');
+                  }}
+                  placeholder={t('driver.book.selectDate')}
                   minDate={todayIso}
                   hasError={!!form.formState.errors.date}
                 />
@@ -262,18 +281,19 @@ export function BookServicePage() {
           </div>
           <div className="space-y-2">
             <label htmlFor="book-time" className="text-sm text-slate-200">
-              {t("driver.book.fieldTime")}
+              {t('driver.book.fieldTime')}
             </label>
             <select
               id="book-time"
               className={cn(
                 inputClass,
-                form.formState.errors.time ? "border-destructive" : "",
+                form.formState.errors.time ? 'border-destructive' : '',
               )}
-              {...form.register("time")}
+              disabled={!watchedDate}
+              {...form.register('time')}
             >
-              <option value="">{t("driver.book.selectTime")}</option>
-              {MOCK_TIME_SLOTS.map((slot) => (
+              <option value="">{t('driver.book.selectTime')}</option>
+              {timeSlots.map((slot) => (
                 <option key={slot} value={slot}>
                   {slot}
                 </option>
@@ -289,24 +309,24 @@ export function BookServicePage() {
 
         <div className="space-y-2">
           <label htmlFor="book-notes" className="text-sm text-slate-200">
-            {t("driver.book.fieldNotes")}
+            {t('driver.book.fieldNotes')}
           </label>
           <textarea
             id="book-notes"
             rows={3}
-            className={cn(inputClass, "min-h-[88px] resize-y py-2")}
-            placeholder={t("driver.book.notesPlaceholder")}
-            {...form.register("notes")}
+            className={cn(inputClass, 'min-h-[88px] resize-y py-2')}
+            placeholder={t('driver.book.notesPlaceholder')}
+            {...form.register('notes')}
           />
         </div>
 
         <Button
           type="submit"
           size="lg"
-          disabled={cars.length === 0}
+          disabled={cars.length === 0 || createBookingMutation.isPending}
           className="h-11 w-full rounded-xl shadow-lg shadow-primary/20"
         >
-          {t("driver.book.submit")}
+          {t('driver.book.submit')}
         </Button>
       </form>
     </div>

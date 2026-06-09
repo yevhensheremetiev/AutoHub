@@ -1,15 +1,16 @@
 import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { ServiceLocationArea, ServiceType } from '@autohub/shared';
 import { MapPin, Star } from 'lucide-react';
 
+import { useServices } from '@/api';
 import { Text } from '@/components/ui/text';
 import {
-  filterStations,
-  MOCK_LOCATIONS,
-  MOCK_SERVICE_TYPES,
-  type ServiceTypeId,
-} from '@/mocks/driver-dashboard';
+  LOCATION_LABEL_KEYS,
+  SERVICE_LOCATION_FILTERS,
+  SERVICE_TYPE_FILTERS,
+} from '@/lib/service-filters';
 import { cn } from '@/lib/utils';
 
 const ServiceStationsMap = lazy(() =>
@@ -20,16 +21,31 @@ const ServiceStationsMap = lazy(() =>
 
 export function DashboardMapPage() {
   const { t } = useTranslation();
-  const [type, setType] = useState<ServiceTypeId | 'all'>('all');
-  const [locationId, setLocationId] = useState('all');
+  const [type, setType] = useState<ServiceType | 'all'>('all');
+  const [locationId, setLocationId] = useState<ServiceLocationArea | 'all'>(
+    'all',
+  );
 
-  const filtered = useMemo(
-    () => filterStations(type, locationId),
+  const queryParams = useMemo(
+    () => ({
+      ...(type !== 'all' ? { type } : {}),
+      ...(locationId !== 'all' ? { locationArea: locationId } : {}),
+    }),
     [type, locationId],
   );
 
+  const { data: stations = [], isLoading, isError } = useServices(queryParams);
+
   const selectClass =
     'h-10 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 md:min-w-[180px]';
+
+  if (isLoading) {
+    return <Text variant="muted">{t('driver.loading')}</Text>;
+  }
+
+  if (isError) {
+    return <Text variant="muted">{t('driver.errors.loadFailed')}</Text>;
+  }
 
   return (
     <div className="space-y-6">
@@ -59,10 +75,10 @@ export function DashboardMapPage() {
               className={selectClass}
               value={type}
               onChange={(e) =>
-                setType(e.target.value as ServiceTypeId | 'all')
+                setType(e.target.value as ServiceType | 'all')
               }
             >
-              {MOCK_SERVICE_TYPES.map((opt) => (
+              {SERVICE_TYPE_FILTERS.map((opt) => (
                 <option key={opt.id} value={opt.id}>
                   {t(opt.labelKey)}
                 </option>
@@ -77,9 +93,11 @@ export function DashboardMapPage() {
               id="filter-location"
               className={selectClass}
               value={locationId}
-              onChange={(e) => setLocationId(e.target.value)}
+              onChange={(e) =>
+                setLocationId(e.target.value as ServiceLocationArea | 'all')
+              }
             >
-              {MOCK_LOCATIONS.map((opt) => (
+              {SERVICE_LOCATION_FILTERS.map((opt) => (
                 <option key={opt.id} value={opt.id}>
                   {t(opt.labelKey)}
                 </option>
@@ -103,7 +121,7 @@ export function DashboardMapPage() {
               />
             }
           >
-            <ServiceStationsMap stations={filtered} />
+            <ServiceStationsMap stations={stations} />
           </Suspense>
         </div>
       </section>
@@ -113,7 +131,7 @@ export function DashboardMapPage() {
           {t('driver.stationListTitle')}
         </Text>
         <ul className="grid gap-3 sm:grid-cols-2">
-          {filtered.map((station) => (
+          {stations.map((station) => (
             <li key={station.id}>
               <Link
                 to={`/dashboard/services/${station.id}`}
@@ -125,7 +143,7 @@ export function DashboardMapPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <Text className="font-medium text-slate-50">
-                      {t(station.nameKey)}
+                      {station.name}
                     </Text>
                     <Text
                       className="mt-1 flex items-start gap-1 text-xs text-slate-400"
@@ -135,7 +153,7 @@ export function DashboardMapPage() {
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500"
                         aria-hidden
                       />
-                      <span>{t(station.addressKey)}</span>
+                      <span>{station.address}</span>
                     </Text>
                   </div>
                   <Text
@@ -143,7 +161,7 @@ export function DashboardMapPage() {
                     className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-200"
                   >
                     <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    {station.rating.toFixed(1)}
+                    {(station.ratingAvg ?? 0).toFixed(1)}
                   </Text>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -151,10 +169,10 @@ export function DashboardMapPage() {
                     as="span"
                     className="rounded-md bg-slate-800/80 px-2 py-0.5 text-[11px] text-slate-300"
                   >
-                    {t(`driver.serviceTypes.${station.type}`)}
+                    {t(`driver.serviceTypes.${station.serviceType}`)}
                   </Text>
                   <Text as="span" className="text-[11px] text-slate-500">
-                    {t(MOCK_LOCATIONS.find((l) => l.id === station.locationKey)?.labelKey ?? '')}
+                    {t(LOCATION_LABEL_KEYS[station.locationArea])}
                   </Text>
                 </div>
                 <span className="mt-4 inline-flex h-9 w-full items-center justify-center rounded-xl bg-primary text-sm font-medium text-primary-foreground shadow hover:bg-primary/90">
@@ -164,7 +182,7 @@ export function DashboardMapPage() {
             </li>
           ))}
         </ul>
-        {!filtered.length ? (
+        {!stations.length ? (
           <Text className="text-sm text-slate-500">{t('driver.noStations')}</Text>
         ) : null}
       </section>

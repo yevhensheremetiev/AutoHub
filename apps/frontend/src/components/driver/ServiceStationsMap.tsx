@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { PublicServiceListItemDto } from '@autohub/shared';
 import {
   Circle,
   MapContainer,
@@ -12,7 +13,6 @@ import {
 import L from 'leaflet';
 
 import { Text } from '@/components/ui/text';
-import type { MockServiceStation } from '@/mocks/driver-dashboard';
 import '@/lib/leaflet-default-icon';
 
 const KYIV_CENTER: L.LatLngTuple = [50.45, 30.52];
@@ -72,7 +72,7 @@ function MapViewSync({
   stations,
   userPoint,
 }: {
-  stations: MockServiceStation[];
+  stations: PublicServiceListItemDto[];
   userPoint: L.LatLngTuple | null;
 }) {
   const map = useMap();
@@ -88,18 +88,17 @@ function MapViewSync({
       return;
     }
     if (allPoints.length === 1) {
-      map.setView(allPoints[0], 14);
+      map.setView(allPoints[0]!, 14);
       return;
     }
-    const bounds = L.latLngBounds(allPoints);
-    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 15 });
+    map.fitBounds(L.latLngBounds(allPoints), { padding: [40, 40], maxZoom: 14 });
   }, [map, stations, userPoint]);
 
   return null;
 }
 
 type ServiceStationsMapProps = {
-  stations: MockServiceStation[];
+  stations: PublicServiceListItemDto[];
 };
 
 export function ServiceStationsMap({ stations }: ServiceStationsMapProps) {
@@ -111,92 +110,70 @@ export function ServiceStationsMap({ stations }: ServiceStationsMapProps) {
     return [geo.lat, geo.lng];
   }, [geo]);
 
-  const accuracyRadius =
-    geo.kind === 'ok'
-      ? Math.min(Math.max(geo.accuracyM, 20), 500)
-      : null;
-
-  const geoHint =
-    geo.kind === 'denied'
-      ? t('driver.geo.denied')
-      : geo.kind === 'unavailable'
-        ? t('driver.geo.unavailable')
-        : null;
-
   return (
-    <div className="space-y-2">
-      <div className="relative h-[280px] w-full overflow-hidden rounded-2xl ring-1 ring-slate-800 md:h-[380px]">
-        <MapContainer
-          center={KYIV_CENTER}
-          zoom={DEFAULT_ZOOM}
-          className="absolute inset-0 z-0 h-full w-full"
-          scrollWheelZoom
-          attributionControl={false}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            subdomains="abc"
+    <div className="relative">
+      <MapContainer
+        center={KYIV_CENTER}
+        zoom={DEFAULT_ZOOM}
+        scrollWheelZoom
+        className="h-[280px] w-full md:h-[380px]"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapViewSync stations={stations} userPoint={userPoint} />
+        {stations.map((station) => (
+          <Marker key={station.id} position={[station.lat, station.lng]}>
+            <Popup>
+              <div className="min-w-[140px] space-y-1 text-sm">
+                <Text className="font-semibold text-slate-900">
+                  {station.name}
+                </Text>
+                <Text className="text-xs text-slate-600">{station.address}</Text>
+                <Link
+                  to={`/dashboard/services/${station.id}`}
+                  className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline"
+                >
+                  {t('driver.openStation')}
+                </Link>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+        {userPoint ? (
+          <Marker position={userPoint} icon={USER_DOT_ICON}>
+            <Popup>
+              <Text className="text-sm font-medium">{t('driver.geo.youAreHere')}</Text>
+              {geo.kind === 'ok' ? (
+                <Text className="text-xs text-slate-600">
+                  {t('driver.geo.accuracy', {
+                    meters: Math.round(geo.accuracyM),
+                  })}
+                </Text>
+              ) : null}
+            </Popup>
+          </Marker>
+        ) : null}
+        {userPoint && geo.kind === 'ok' ? (
+          <Circle
+            center={userPoint}
+            radius={geo.accuracyM}
+            pathOptions={{
+              color: '#2563eb',
+              fillColor: '#2563eb',
+              fillOpacity: 0.08,
+              weight: 1,
+            }}
           />
-          <MapViewSync stations={stations} userPoint={userPoint} />
-          {userPoint && accuracyRadius !== null ? (
-            <Circle
-              center={userPoint}
-              radius={accuracyRadius}
-              pathOptions={{
-                color: '#3b82f6',
-                fillColor: '#3b82f6',
-                fillOpacity: 0.1,
-                weight: 1,
-              }}
-            />
-          ) : null}
-          {userPoint ? (
-            <Marker position={userPoint} icon={USER_DOT_ICON}>
-              <Popup
-                className="[&_.leaflet-popup-content]:!m-3 [&_.leaflet-popup-content-wrapper]:rounded-lg"
-                autoPan
-              >
-                <p className="text-sm font-semibold text-slate-800">
-                  {t('driver.geo.youAreHere')}
-                </p>
-                {geo.kind === 'ok' ? (
-                  <p className="mt-1 text-xs text-slate-600">
-                    {t('driver.geo.accuracy', {
-                      meters: Math.round(geo.accuracyM),
-                    })}
-                  </p>
-                ) : null}
-              </Popup>
-            </Marker>
-          ) : null}
-          {stations.map((station) => (
-            <Marker key={station.id} position={[station.lat, station.lng]}>
-              <Popup
-                className="[&_.leaflet-popup-content]:!m-3 [&_.leaflet-popup-content-wrapper]:rounded-lg"
-                autoPan
-              >
-                <div className="min-w-[160px] space-y-2 text-slate-800">
-                  <p className="font-semibold leading-tight">
-                    {t(station.nameKey)}
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    {t(station.addressKey)}
-                  </p>
-                  <Link
-                    to={`/dashboard/services/${station.id}`}
-                    className="inline-flex text-sm font-medium text-sky-700 underline-offset-2 hover:underline"
-                  >
-                    {t('driver.openStation')}
-                  </Link>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
-      {geoHint ? (
-        <Text className="text-xs text-slate-500" variant="muted">
-          {geoHint}
+        ) : null}
+      </MapContainer>
+      {geo.kind === 'denied' ? (
+        <Text className="mt-2 text-xs text-amber-400/90">{t('driver.geo.denied')}</Text>
+      ) : null}
+      {geo.kind === 'unavailable' ? (
+        <Text className="mt-2 text-xs text-slate-500">
+          {t('driver.geo.unavailable')}
         </Text>
       ) : null}
     </div>

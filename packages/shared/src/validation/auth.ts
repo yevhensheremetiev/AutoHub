@@ -147,7 +147,14 @@ export function createSignUpSchema(
       .string()
       .min(1, { message: messages.confirmPasswordRequired }),
     serviceName: z.string().trim().optional(),
-    serviceAddress: z.string().trim().optional(),
+    serviceAddress: z
+      .string()
+      .trim()
+      .optional()
+      .refine(
+        (v) => !v || /^[^,]{2,},\s*[^,]{2,}/.test(v),
+        { message: 'Use format: City / town, street' },
+      ),
   });
 
   return base
@@ -207,7 +214,14 @@ export function createSignUpRequestSchema(
       .min(1, { message: messages.passwordRequired })
       .pipe(createStrongPasswordSchema(messages)),
     serviceName: z.string().trim().optional(),
-    serviceAddress: z.string().trim().optional(),
+    serviceAddress: z
+      .string()
+      .trim()
+      .optional()
+      .refine(
+        (v) => !v || /^[^,]{2,},\s*[^,]{2,}/.test(v),
+        { message: 'Use format: City / town, street' },
+      ),
   });
 
   return base.superRefine((data, ctx) => {

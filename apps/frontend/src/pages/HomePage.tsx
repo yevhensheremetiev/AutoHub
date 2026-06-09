@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import { useMe } from '@/api';
+import { getDashboardPath } from '@/lib/dashboard-path';
 import { AccentSwitcher } from '@/components/AccentSwitcher';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,10 @@ export function HomePage() {
   }
 
   function handleDashboard() {
+    if (me) {
+      navigate(getDashboardPath(me.accountType));
+      return;
+    }
     navigate('/dashboard');
   }
 

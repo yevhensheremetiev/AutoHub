@@ -17,6 +17,7 @@ import { useGoogleAuth, useSignUp } from '@/api';
 import { firebaseAuth, googleProvider } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 import { createSignUpSchema, type SignUpFormValues } from '@autohub/shared';
+import { getDashboardPath } from '@/lib/dashboard-path';
 
 export function SignUpPage() {
   const navigate = useNavigate();
@@ -84,8 +85,8 @@ export function SignUpPage() {
           values.accountType === 'SERVICE' ? values.serviceAddress : undefined,
       },
       {
-        onSuccess: () => {
-          navigate('/dashboard');
+        onSuccess: (user) => {
+          navigate(getDashboardPath(user.accountType));
         },
         onError: (error) => {
           if (axios.isAxiosError(error) && error.response?.status === 409) {
@@ -107,9 +108,9 @@ export function SignUpPage() {
     );
     const idToken = await result.user.getIdToken();
 
-    await googleSignUpMutation.mutateAsync({ idToken });
+    const user = await googleSignUpMutation.mutateAsync({ idToken });
 
-    navigate('/dashboard');
+    navigate(getDashboardPath(user.accountType));
   }
 
   const inputClass =

@@ -1,17 +1,29 @@
 import { useTranslation } from 'react-i18next';
+import type { ReviewListItemDto } from '@autohub/shared';
 import { MessageSquare } from 'lucide-react';
 
 import { StarRating } from '@/components/driver/StarRating';
 import { Text } from '@/components/ui/text';
-import { getReviewComment, useStationReviews } from '@/hooks/useMockReviews';
 
 type StationReviewsSectionProps = {
-  stationId: string;
+  reviews: ReviewListItemDto[];
+  reviewCount: number;
 };
 
-export function StationReviewsSection({ stationId }: StationReviewsSectionProps) {
-  const { t } = useTranslation();
-  const { stationReviews, reviewCount } = useStationReviews(stationId);
+function formatReviewDate(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
+export function StationReviewsSection({
+  reviews,
+  reviewCount,
+}: StationReviewsSectionProps) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'uk' ? 'uk-UA' : 'en-GB';
 
   return (
     <section className="rounded-2xl border border-slate-800/80 bg-slate-900/40 p-5 shadow-lg shadow-black/15">
@@ -31,13 +43,13 @@ export function StationReviewsSection({ stationId }: StationReviewsSectionProps)
         {t('driver.reviews.sectionHint')}
       </Text>
 
-      {stationReviews.length === 0 ? (
+      {reviews.length === 0 ? (
         <Text className="mt-5 text-sm text-slate-500" variant="muted">
           {t('driver.reviews.empty')}
         </Text>
       ) : (
         <ul className="mt-5 space-y-4">
-          {stationReviews.map((review) => (
+          {reviews.map((review) => (
             <li
               key={review.id}
               className="rounded-xl border border-slate-800/60 bg-slate-950/40 p-4"
@@ -49,11 +61,15 @@ export function StationReviewsSection({ stationId }: StationReviewsSectionProps)
                     {review.authorName}
                   </Text>
                 </div>
-                <Text className="text-xs text-slate-500">{review.createdAt}</Text>
+                <Text className="text-xs text-slate-500">
+                  {formatReviewDate(review.createdAt, locale)}
+                </Text>
               </div>
-              <Text className="mt-2 text-sm leading-relaxed text-slate-300">
-                {getReviewComment(review, t)}
-              </Text>
+              {review.comment ? (
+                <Text className="mt-2 text-sm leading-relaxed text-slate-300">
+                  {review.comment}
+                </Text>
+              ) : null}
             </li>
           ))}
         </ul>

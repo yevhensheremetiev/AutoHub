@@ -9,6 +9,10 @@ import { FirebaseModule } from './firebase/firebase.module';
 import { AuthModule } from './auth/auth.module';
 import { CarsModule } from './cars/cars.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ServiceCenterModule } from './service-center/service-center.module';
+import { ServicesModule } from './services/services.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { DriverModule } from './driver/driver.module';
 
 @Module({
   imports: [
@@ -26,6 +30,10 @@ import { ReviewsModule } from './reviews/reviews.module';
     AuthModule,
     CarsModule,
     ReviewsModule,
+    ServiceCenterModule,
+    ServicesModule,
+    BookingsModule,
+    DriverModule,
   ],
   controllers: [AppController],
   providers: [

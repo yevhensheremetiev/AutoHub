@@ -17,6 +17,7 @@ import { useGoogleAuth, useLogin } from '@/api';
 import { firebaseAuth, googleProvider } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 import { createLoginSchema, type LoginFormValues } from '@autohub/shared';
+import { getDashboardPath } from '@/lib/dashboard-path';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -54,8 +55,8 @@ export function LoginPage() {
   const onEmailSubmit = form.handleSubmit((values) => {
     setSubmitError(null);
     loginMutation.mutate(values, {
-      onSuccess: () => {
-        navigate('/dashboard');
+      onSuccess: (user) => {
+        navigate(getDashboardPath(user.accountType));
       },
       onError: (error) => {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -76,9 +77,9 @@ export function LoginPage() {
     );
     const idToken = await result.user.getIdToken();
 
-    await googleAuthMutation.mutateAsync({ idToken });
+    const user = await googleAuthMutation.mutateAsync({ idToken });
 
-    navigate('/dashboard');
+    navigate(getDashboardPath(user.accountType));
   }
 
   const inputClass =

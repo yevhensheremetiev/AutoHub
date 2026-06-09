@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Car, History, Home, LogOut, Map, User } from 'lucide-react';
 
 import { useLogout, useMe } from '@/api';
+import { getDashboardPath } from '@/lib/dashboard-path';
 import { AccentSwitcher } from '@/components/AccentSwitcher';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,11 @@ export function DriverDashboardLayout() {
     }
   }, [isError, error, isFetching, navigate]);
 
+  useEffect(() => {
+    if (!me || me.accountType === 'DRIVER') return;
+    navigate(getDashboardPath('SERVICE'), { replace: true });
+  }, [me, navigate]);
+
   async function handleLogout() {
     await logoutMutation.mutateAsync();
     navigate('/login');
@@ -52,7 +58,7 @@ export function DriverDashboardLayout() {
     );
   }
 
-  if (!me) {
+  if (!me || me.accountType !== 'DRIVER') {
     return null;
   }
 

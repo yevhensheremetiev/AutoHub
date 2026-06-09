@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./client"
 }
 
 datasource db {
@@ -33,10 +32,29 @@ enum AccountType {
   SERVICE
 }
 
+enum ServiceType {
+  WASH
+  REPAIR
+  TIRE
+  DIAGNOSTIC
+}
+
+enum ServiceLocationArea {
+  CENTER
+  LEFT_BANK
+  RIGHT_BANK
+}
+
 model Service {
   id           String   @id @default(cuid())
   name         String
   address      String
+  phone        String?
+  hours        String?
+  serviceType  ServiceType?
+  locationArea ServiceLocationArea?
+  lat          Float?
+  lng          Float?
   /** Average of all review ratings for bookings at this service. */
   ratingAvg    Float?
   ratingCount  Int      @default(0)
@@ -57,6 +75,7 @@ model Offering {
   description     String?
   durationMinutes Int
   priceUah        Int
+  active          Boolean  @default(true)
   /** Average of review ratings for bookings of this offering only. */
   ratingAvg       Float?
   ratingCount     Int      @default(0)
@@ -87,6 +106,7 @@ model Booking {
   scheduledAt DateTime
   status      BookingStatus @default(PENDING)
   notes       String?
+  workResult  String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 

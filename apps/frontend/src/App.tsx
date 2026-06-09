@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { DriverDashboardLayout } from '@/components/driver/DriverDashboardLayout';
+import { ServiceDashboardLayout } from '@/components/service/ServiceDashboardLayout';
 import { BookServicePage } from '@/pages/driver/BookServicePage';
 import { DriverAddCarPage } from '@/pages/driver/DriverAddCarPage.tsx';
 import { DriverEditCarPage } from '@/pages/driver/DriverEditCarPage.tsx';
@@ -17,6 +18,11 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { SignUpPage } from './pages/SignUpPage.tsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
 import { ProfilePage } from './pages/ProfilePage.tsx';
+import { ServiceBookingDetailPage } from './pages/service/ServiceBookingDetailPage';
+import { ServiceBookingsPage } from './pages/service/ServiceBookingsPage';
+import { ServiceCatalogPage } from './pages/service/ServiceCatalogPage';
+import { ServiceCenterProfilePage } from './pages/service/ServiceCenterProfilePage';
+import { ServiceDashboardHomePage } from './pages/service/ServiceDashboardHomePage';
 
 export default function App() {
   return (
@@ -26,6 +32,17 @@ export default function App() {
       <Route path="/signup" element={<SignUpPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/service-dashboard" element={<ServiceDashboardLayout />}>
+        <Route index element={<ServiceDashboardHomePage />} />
+        <Route path="bookings" element={<ServiceBookingsPage />} />
+        <Route
+          path="bookings/:bookingId"
+          element={<ServiceBookingDetailPage />}
+        />
+        <Route path="catalog" element={<ServiceCatalogPage />} />
+        <Route path="profile" element={<ServiceCenterProfilePage />} />
+        <Route path="account" element={<ProfilePage />} />
+      </Route>
       <Route path="/dashboard" element={<DriverDashboardLayout />}>
         <Route index element={<DashboardHomePage />} />
         <Route path="map" element={<DashboardMapPage />} />
