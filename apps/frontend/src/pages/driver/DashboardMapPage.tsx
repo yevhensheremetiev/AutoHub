@@ -39,10 +39,6 @@ export function DashboardMapPage() {
   const selectClass =
     'h-10 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-3 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 md:min-w-[180px]';
 
-  if (isLoading) {
-    return <Text variant="muted">{t('driver.loading')}</Text>;
-  }
-
   if (isError) {
     return <Text variant="muted">{t('driver.errors.loadFailed')}</Text>;
   }
@@ -107,20 +103,15 @@ export function DashboardMapPage() {
         </div>
       </section>
 
+      {!isLoading ? (
+        <>
       <section aria-label={t('driver.mapAria')}>
         <div
           className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/80 shadow-inner"
           role="application"
           aria-label={t('driver.mapIllustrationAria')}
         >
-          <Suspense
-            fallback={
-              <div
-                className="h-[280px] w-full animate-pulse rounded-2xl bg-slate-800/40 md:h-[380px]"
-                aria-hidden
-              />
-            }
-          >
+          <Suspense fallback={null}>
             <ServiceStationsMap stations={stations} />
           </Suspense>
         </div>
@@ -186,6 +177,8 @@ export function DashboardMapPage() {
           <Text className="text-sm text-slate-500">{t('driver.noStations')}</Text>
         ) : null}
       </section>
+        </>
+      ) : null}
     </div>
   );
 }

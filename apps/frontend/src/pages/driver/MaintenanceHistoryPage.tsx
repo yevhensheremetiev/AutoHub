@@ -14,10 +14,6 @@ export function MaintenanceHistoryPage() {
   const { data: history = [], isLoading, isError } = useDriverHistory();
   const locale = i18n.language === 'uk' ? 'uk-UA' : 'en-GB';
 
-  if (isLoading) {
-    return <Text variant="muted">{t('driver.loading')}</Text>;
-  }
-
   if (isError) {
     return <Text variant="muted">{t('driver.errors.loadFailed')}</Text>;
   }
@@ -33,11 +29,11 @@ export function MaintenanceHistoryPage() {
         </Text>
       </div>
 
-      {history.length === 0 ? (
+      {!isLoading && history.length === 0 ? (
         <Text className="text-sm text-slate-400" variant="muted">
           {t('driver.history.empty')}
         </Text>
-      ) : (
+      ) : !isLoading ? (
         <ol className="space-y-3">
           {history.map((item) => (
             <li
@@ -79,7 +75,7 @@ export function MaintenanceHistoryPage() {
             </li>
           ))}
         </ol>
-      )}
+      ) : null}
     </div>
   );
 }

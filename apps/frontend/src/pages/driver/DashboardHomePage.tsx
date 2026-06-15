@@ -42,10 +42,6 @@ export function DashboardHomePage() {
       ]
     : [];
 
-  if (isLoading) {
-    return <Text variant="muted">{t('driver.loading')}</Text>;
-  }
-
   if (isError) {
     return <Text variant="muted">{t('driver.errors.loadFailed')}</Text>;
   }
@@ -73,6 +69,8 @@ export function DashboardHomePage() {
         </div>
       </section>
 
+      {!isLoading ? (
+        <>
       <section aria-labelledby="dash-metrics-heading">
         <Text
           as="h2"
@@ -158,6 +156,8 @@ export function DashboardHomePage() {
           </ul>
         )}
       </section>
+        </>
+      ) : null}
     </div>
   );
 }

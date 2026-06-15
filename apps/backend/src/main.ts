@@ -14,8 +14,10 @@ async function bootstrap() {
   }
 
   app.use(cookieParser());
+  const clientOrigin =
+    process.env.CLIENT_ORIGIN?.replace(/\/$/, '') ?? 'http://localhost:5173';
   app.enableCors({
-    origin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+    origin: clientOrigin,
     credentials: true,
   });
 

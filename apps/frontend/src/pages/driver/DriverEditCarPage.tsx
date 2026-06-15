@@ -121,9 +121,7 @@ export function DriverEditCarPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <Text className="text-slate-400">{t('driver.loading')}</Text>
-      ) : (
+      {!isLoading ? (
         <div className="rounded-2xl border border-slate-800/80 bg-slate-900/50 p-5 shadow-lg shadow-black/10">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
@@ -166,7 +164,7 @@ export function DriverEditCarPage() {
             </div>
           </form>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -58,11 +58,7 @@ export function ServiceDashboardLayout() {
   }
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-50">
-        <Text variant="muted">{t('service.loading')}</Text>
-      </main>
-    );
+    return null;
   }
 
   if (!me || me.accountType !== 'SERVICE') {
