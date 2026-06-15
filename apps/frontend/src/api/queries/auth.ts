@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   authenticateWithGoogle,
@@ -15,21 +15,26 @@ import {
   type LoginInput,
   type ResetPasswordInput,
   type SignUpInput,
-} from '@/api/modules/auth';
+} from "@/api/modules/auth";
 import type {
   ChangePasswordRequestBody,
   UpdateProfileRequestBody,
-} from '@autohub/shared';
+} from "@autohub/shared";
 
 export const authQueryKeys = {
-  me: ['me'] as const,
+  me: ["me"] as const,
 };
 
 export function useMe() {
-  return useQuery({
+  const query = useQuery({
     queryKey: authQueryKeys.me,
     queryFn: getMe,
   });
+
+  return {
+    ...query,
+    isLoading: query.isPending && query.isFetching,
+  };
 }
 
 export function useSignUp() {
@@ -84,15 +89,13 @@ export function useUpdateProfile() {
 
 export function useChangePassword() {
   return useMutation({
-    mutationFn: (payload: ChangePasswordRequestBody) =>
-      changePassword(payload),
+    mutationFn: (payload: ChangePasswordRequestBody) => changePassword(payload),
   });
 }
 
 export function useRequestPasswordReset() {
   return useMutation({
-    mutationFn: (payload: ForgotPasswordInput) =>
-      requestPasswordReset(payload),
+    mutationFn: (payload: ForgotPasswordInput) => requestPasswordReset(payload),
   });
 }
 

@@ -80,7 +80,7 @@ export function ServiceCenterProfilePage() {
   });
 
   if (isLoading) {
-    return <Text variant="muted">{t('service.loading')}</Text>;
+    return null;
   }
 
   if (isError || !profile) {

@@ -29,10 +29,6 @@ export function DashboardCarsPage() {
         </Button>
       </div>
 
-      {isLoading ? (
-        <Text className="text-slate-400">{t('driver.loading')}</Text>
-      ) : null}
-
       {isError ? (
         <Text className="text-destructive">
           {error instanceof Error ? error.message : t('driver.carsLoadError')}

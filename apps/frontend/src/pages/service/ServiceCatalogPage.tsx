@@ -9,10 +9,6 @@ export function ServiceCatalogPage() {
   const { t } = useTranslation();
   const { data: offerings = [], isLoading, isError } = useServiceOfferings();
 
-  if (isLoading) {
-    return <Text variant="muted">{t('service.loading')}</Text>;
-  }
-
   if (isError) {
     return <Text variant="muted">{t('service.errors.loadFailed')}</Text>;
   }
@@ -28,11 +24,11 @@ export function ServiceCatalogPage() {
         </Text>
       </div>
 
-      {offerings.length === 0 ? (
+      {!isLoading && offerings.length === 0 ? (
         <Text className="text-sm text-slate-400" variant="muted">
           {t('service.catalog.empty')}
         </Text>
-      ) : (
+      ) : !isLoading ? (
         <ul className="space-y-3">
           {offerings.map((offering) => (
             <li
@@ -80,7 +76,7 @@ export function ServiceCatalogPage() {
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -20,7 +20,7 @@ export function ServiceDetailPage() {
       : station?.ratingAvg;
 
   if (isLoading) {
-    return <Text variant="muted">{t('driver.loading')}</Text>;
+    return null;
   }
 
   if (isError || !station) {

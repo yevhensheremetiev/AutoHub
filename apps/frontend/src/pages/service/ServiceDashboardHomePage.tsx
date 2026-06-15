@@ -51,10 +51,6 @@ export function ServiceDashboardHomePage() {
       ? formatServiceBookingDate(todayBookings[0]!.scheduledAt, locale)
       : formatServiceBookingDate(new Date().toISOString(), locale);
 
-  if (isLoading) {
-    return <Text variant="muted">{t('service.loading')}</Text>;
-  }
-
   if (isError) {
     return (
       <Text variant="muted">{t('service.errors.loadFailed')}</Text>
@@ -84,6 +80,8 @@ export function ServiceDashboardHomePage() {
         </div>
       </section>
 
+      {!isLoading ? (
+        <>
       <section aria-labelledby="service-metrics-heading">
         <Text
           as="h2"
@@ -174,6 +172,8 @@ export function ServiceDashboardHomePage() {
           </ul>
         )}
       </section>
+        </>
+      ) : null}
     </div>
   );
 }

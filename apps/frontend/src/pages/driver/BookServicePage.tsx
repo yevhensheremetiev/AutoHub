@@ -89,7 +89,7 @@ export function BookServicePage() {
   const selectedOffering = station?.offerings.find((o) => o.id === offeringId);
 
   if (isLoading) {
-    return <Text variant="muted">{t('driver.loading')}</Text>;
+    return null;
   }
 
   if (isError || !station) {

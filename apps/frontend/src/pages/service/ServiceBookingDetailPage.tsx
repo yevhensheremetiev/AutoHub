@@ -25,7 +25,7 @@ export function ServiceBookingDetailPage() {
   const locale = i18n.language === 'uk' ? 'uk-UA' : 'en-GB';
 
   if (isLoading) {
-    return <Text variant="muted">{t('service.loading')}</Text>;
+    return null;
   }
 
   if (isError || !booking) {

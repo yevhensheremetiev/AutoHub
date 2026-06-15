@@ -33,10 +33,6 @@ export function ServiceBookingsPage() {
     })),
   ];
 
-  if (isLoading) {
-    return <Text variant="muted">{t('service.loading')}</Text>;
-  }
-
   if (isError) {
     return <Text variant="muted">{t('service.errors.loadFailed')}</Text>;
   }
@@ -76,11 +72,11 @@ export function ServiceBookingsPage() {
         ))}
       </div>
 
-      {bookings.length === 0 ? (
+      {!isLoading && bookings.length === 0 ? (
         <Text className="text-sm text-slate-400" variant="muted">
           {t('service.bookings.empty')}
         </Text>
-      ) : (
+      ) : !isLoading ? (
         <ul className="divide-y divide-slate-800/80 rounded-2xl border border-slate-800/80 bg-slate-900/40">
           {bookings.map((b) => (
             <li key={b.id}>
@@ -111,7 +107,7 @@ export function ServiceBookingsPage() {
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </div>
   );
 }
