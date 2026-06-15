@@ -111,13 +111,14 @@ export function ServiceStationsMap({ stations }: ServiceStationsMapProps) {
   }, [geo]);
 
   return (
-    <div className="relative">
-      <MapContainer
-        center={KYIV_CENTER}
-        zoom={DEFAULT_ZOOM}
-        scrollWheelZoom
-        className="h-[280px] w-full md:h-[380px]"
-      >
+    <div>
+      <div className="overflow-hidden rounded-t-2xl">
+        <MapContainer
+          center={KYIV_CENTER}
+          zoom={DEFAULT_ZOOM}
+          scrollWheelZoom
+          className="h-[280px] w-full md:h-[380px]"
+        >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -167,12 +168,15 @@ export function ServiceStationsMap({ stations }: ServiceStationsMapProps) {
             }}
           />
         ) : null}
-      </MapContainer>
+        </MapContainer>
+      </div>
       {geo.kind === 'denied' ? (
-        <Text className="mt-2 text-xs text-amber-400/90">{t('driver.geo.denied')}</Text>
+        <Text className="px-4 py-3 text-xs leading-normal text-amber-400/90">
+          {t('driver.geo.denied')}
+        </Text>
       ) : null}
       {geo.kind === 'unavailable' ? (
-        <Text className="mt-2 text-xs text-slate-500">
+        <Text className="px-4 py-3 text-xs leading-normal text-slate-500">
           {t('driver.geo.unavailable')}
         </Text>
       ) : null}

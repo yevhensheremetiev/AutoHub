@@ -107,7 +107,7 @@ export function DashboardMapPage() {
         <>
       <section aria-label={t('driver.mapAria')}>
         <div
-          className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/80 shadow-inner"
+          className="rounded-2xl border border-slate-800 bg-slate-950/80 shadow-inner"
           role="application"
           aria-label={t('driver.mapIllustrationAria')}
         >
