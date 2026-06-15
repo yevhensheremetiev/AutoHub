@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import animate from 'tailwindcss-animate'
+import animate from 'tailwindcss-animate';
 
 export default {
   darkMode: ['class'],
@@ -13,6 +13,9 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -56,5 +59,4 @@ export default {
     },
   },
   plugins: [animate],
-}
-
+};

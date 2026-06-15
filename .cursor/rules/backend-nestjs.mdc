@@ -10,5 +10,5 @@ alwaysApply: false
 - Prisma is accessed via `PrismaService` (from `src/prisma/prisma.module.ts`).
 - Firebase Admin is provided via `FIREBASE_ADMIN` token (from `src/firebase/firebase.module.ts`).
 - Prefer modules per domain (`src/<domain>/*`) and keep controllers thin.
-- When adding endpoints, validate input (DTOs) and return explicit response shapes.
+- When adding endpoints, **always validate request bodies**; prefer **Zod schemas from `@autohub/shared`** (same rules as the frontend) with the existing **`ZodValidationPipe`**, and return explicit response shapes.
 

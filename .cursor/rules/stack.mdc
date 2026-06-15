@@ -14,11 +14,12 @@ alwaysApply: true
 
 - `apps/backend/` – NestJS API
 - `apps/frontend/` – React app
-- `packages/shared/` – shared types/utils
+- `packages/shared/` – shared types, **Zod validation** (aligned with API + forms)
 
 ## General conventions
 
 - Prefer **type-safe** boundaries (DTOs + Zod schemas where appropriate).
+- **Forms:** Always add validation (React Hook Form + Zod); share schemas via **`packages/shared`** when they mirror API rules.
 - Keep configuration in ENV; never hardcode secrets.
 - Use **absolute imports** in frontend via `@/…`.
 - Keep code minimal and readable; avoid premature abstractions.

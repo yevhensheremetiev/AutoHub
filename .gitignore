@@ -2,6 +2,9 @@
 
 node_modules
 dist
+
+# Prisma generated client (see apps/backend/prisma/schema.prisma)
+apps/backend/prisma/client
 build
 .turbo
 .vite

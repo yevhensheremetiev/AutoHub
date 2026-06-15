@@ -2,9 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link id="app-favicon" rel="icon" type="image/svg+xml" href="/favicon-dark.svg" />
+    <script>
+      (function () {
+        var mql = window.matchMedia("(prefers-color-scheme: dark)");
+        var faviconEl = document.getElementById("app-favicon");
+        if (!faviconEl) return;
+
+        // In dark theme show light favicon (and vice versa) for better contrast.
+        function setFavicon(isDark) {
+          faviconEl.href = isDark ? "/favicon-light.svg" : "/favicon-dark.svg";
+        }
+
+        setFavicon(mql.matches);
+
+        // Safari fallback for older browsers.
+        if (typeof mql.addEventListener === "function") {
+          mql.addEventListener("change", function (e) {
+            setFavicon(e.matches);
+          });
+        } else if (typeof mql.addListener === "function") {
+          mql.addListener(function (e) {
+            setFavicon(e.matches);
+          });
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>AutoHub</title>
   </head>
   <body>
     <div id="root"></div>

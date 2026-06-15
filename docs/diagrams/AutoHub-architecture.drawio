@@ -1,0 +1,88 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Сторінка-1" id="n3DiEYXmRbd7dhqUkT1X">
+    <mxGraphModel dx="1205" dy="474" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" value="" vertex="1">
+          <mxGeometry height="247" width="371" x="36" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-9" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="OG2Gwep_EmsI4fFY3fmL-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="React User Interface" vertex="1">
+          <mxGeometry height="60" width="120" x="73" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Клієнтська частина застосунку" vertex="1">
+          <mxGeometry height="46" width="126" x="255" y="472" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-10" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="OG2Gwep_EmsI4fFY3fmL-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="App Logic (State Management)" vertex="1">
+          <mxGeometry height="60" width="120" x="73" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="API Client" vertex="1">
+          <mxGeometry height="60" width="120" x="255" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" value="" vertex="1">
+          <mxGeometry height="247" width="535" x="440" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-30" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="OG2Gwep_EmsI4fFY3fmL-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Controller" vertex="1">
+          <mxGeometry height="60" width="120" x="467" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Service (NestJS provider)" vertex="1">
+          <mxGeometry height="60" width="120" x="467" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Repository" vertex="1">
+          <mxGeometry height="38" width="120" x="633" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="PostgreSQL Database" vertex="1">
+          <mxGeometry height="36" width="120" x="633" y="614" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Prisma ORM Engine" vertex="1">
+          <mxGeometry height="54.5" width="120" x="633" y="531.25" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-32" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;dashed=1;" target="OG2Gwep_EmsI4fFY3fmL-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Data Models" vertex="1">
+          <mxGeometry height="60" width="120" x="820" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-18" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Серверна частина застосунку" vertex="1">
+          <mxGeometry height="30" width="146" x="817" y="469" as="geometry" />
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-21" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-7" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" target="OG2Gwep_EmsI4fFY3fmL-12" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="443" y="465" as="sourcePoint" />
+            <mxPoint x="493" y="415" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-22" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-12" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" target="OG2Gwep_EmsI4fFY3fmL-7" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="443" y="465" as="sourcePoint" />
+            <mxPoint x="493" y="415" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-27" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-16" style="endArrow=none;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endFill=0;startFill=1;" target="OG2Gwep_EmsI4fFY3fmL-14" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="645" y="537" as="sourcePoint" />
+            <mxPoint x="695" y="487" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-28" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-15" style="endArrow=none;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startFill=1;endFill=0;" target="OG2Gwep_EmsI4fFY3fmL-16" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="645" y="588" as="sourcePoint" />
+            <mxPoint x="695" y="538" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="OG2Gwep_EmsI4fFY3fmL-31" edge="1" parent="1" source="OG2Gwep_EmsI4fFY3fmL-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.998;entryY=0.317;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="OG2Gwep_EmsI4fFY3fmL-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
