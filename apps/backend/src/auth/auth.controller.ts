@@ -38,6 +38,22 @@ const AUTH_THROTTLE_TTL_MS = 60_000;
 const AUTH_CREDENTIAL_LIMIT = 60;
 const AUTH_FORGOT_PASSWORD_LIMIT = 20;
 
+function sessionCookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    // Cross-origin frontend (Vercel) + API (Render) requires SameSite=None.
+    sameSite: isProduction ? ('none' as const) : ('lax' as const),
+    secure: isProduction,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+}
+
+function clearSessionCookieOptions() {
+  const { maxAge: _maxAge, ...options } = sessionCookieOptions();
+  return options;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -51,12 +67,7 @@ export class AuthController {
   ): Promise<MeResponseDto> {
     const { user, token } = await this.authService.signUpWithEmail(body);
 
-    res.cookie(SESSION_COOKIE_NAME, token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(SESSION_COOKIE_NAME, token, sessionCookieOptions());
 
     return this.authService.toMeResponse(user);
   }
@@ -70,12 +81,7 @@ export class AuthController {
   ): Promise<MeResponseDto> {
     const { user, token } = await this.authService.loginWithEmail(body);
 
-    res.cookie(SESSION_COOKIE_NAME, token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(SESSION_COOKIE_NAME, token, sessionCookieOptions());
 
     return this.authService.toMeResponse(user);
   }
@@ -89,12 +95,7 @@ export class AuthController {
   ): Promise<MeResponseDto> {
     const { user, token } = await this.authService.authenticateWithGoogle(body);
 
-    res.cookie(SESSION_COOKIE_NAME, token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(SESSION_COOKIE_NAME, token, sessionCookieOptions());
 
     return this.authService.toMeResponse(user);
   }
@@ -103,11 +104,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Res({ passthrough: true }) res: Response): Promise<void> {
-    res.clearCookie(SESSION_COOKIE_NAME, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
+    res.clearCookie(SESSION_COOKIE_NAME, clearSessionCookieOptions());
   }
 
   @Throttle({ default: { limit: AUTH_FORGOT_PASSWORD_LIMIT, ttl: AUTH_THROTTLE_TTL_MS } })
