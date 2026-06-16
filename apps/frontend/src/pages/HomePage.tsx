@@ -67,7 +67,7 @@ export function HomePage() {
         <div className="animate-[pulse_12s_ease-in-out_infinite] bg-[radial-gradient(circle_at_20%_20%,_rgba(56,189,248,0.12),_transparent_50%),_radial-gradient(circle_at_80%_60%,_rgba(147,51,234,0.12),_transparent_50%)] blur-3xl" />
       </div>
       <div className="container flex max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6">
-        <header className="flex items-center justify-between animate-[fade-down_0.6s_ease-out]">
+        <header className="flex flex-wrap items-center justify-between gap-3 animate-[fade-down_0.6s_ease-out]">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/50 transition-transform duration-300 hover:-translate-y-0.5 hover:rotate-3">
               <Text
@@ -86,7 +86,7 @@ export function HomePage() {
               </Text>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <AccentSwitcher />
             <LanguageSwitcher />
             {me && !isMeError ? (
@@ -94,7 +94,7 @@ export function HomePage() {
                 type="button"
                 size="sm"
                 onClick={handleDashboard}
-                className="hidden rounded-full sm:inline-flex"
+                className="rounded-full"
               >
                 <LayoutDashboard className="mr-2 h-4 w-4" aria-hidden />
                 {t("home.goToDashboard")}
@@ -106,7 +106,7 @@ export function HomePage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleLogin}
-                  className="hidden text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 sm:inline-flex"
+                  className="text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
                 >
                   {t("auth.loginTitle")}
                 </Button>
@@ -114,7 +114,7 @@ export function HomePage() {
                   type="button"
                   size="sm"
                   onClick={handleSignUp}
-                  className="hidden rounded-full sm:inline-flex"
+                  className="rounded-full"
                 >
                   {t("auth.signUp")}
                 </Button>
